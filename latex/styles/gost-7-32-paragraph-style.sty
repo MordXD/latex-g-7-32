@@ -1,0 +1,50 @@
+% gost-7-32-paragraph-style.sty - Стилевой файл для оформления параграфов по ГОСТ 7-32-2017
+%
+% Данный стилевой файл содержит настройки для оформления
+% параграфов и текстового форматирования в соответствии с ГОСТ 7-32-2017.
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gost-7-32-paragraph-style}[2024/03/10 v1.0 Paragraph formatting for GOST 7-32-2017]
+
+% Загружаем необходимые пакеты
+\RequirePackage{indentfirst}
+\RequirePackage{setspace}
+
+% Настройка абзацного отступа (красной строки)
+% Проверяем, было ли уже установлено значение
+\AtBeginDocument{%
+  \setlength{\parindent}{12.5mm}%
+}
+
+% Межстрочный интервал 1.5
+% Проверяем, был ли уже установлен интервал
+\AtBeginDocument{%
+  \renewcommand{\baselinestretch}{1.5}%
+}
+
+% Команда для отступа без красной строки
+\newcommand{\noindentpar}{\noindent}
+
+% Настройка выравнивания текста по ширине
+\raggedbottom
+\flushbottom
+
+% Предотвращение выступов текста
+\sloppy
+
+% Команда для создания аккуратного разрыва страницы
+\newcommand{\cleanbreak}{\clearpage}
+
+% Команда для отступа абзаца
+\newcommand{\indentparagraph}[1]{%
+    \par\vspace{1em}%
+    \noindent\hspace{12.5mm}#1\par%
+}
+
+% Команда для оформления специального абзаца
+\newcommand{\specialparagraph}[1]{%
+    \par\noindent\textbf{#1}\par%
+}
+
+\endinput 

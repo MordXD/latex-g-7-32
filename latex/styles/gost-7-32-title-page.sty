@@ -1,0 +1,47 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gost-7-32-title-page}[2023/03/09 GOST 7.32-2017 title page style]
+
+% Команда для вставки титульной страницы
+\newcommand{\maketitlepage}{
+\begin{titlepage}
+    \centering
+    \fontsize{14pt}{16pt}\selectfont
+    
+    \ministry
+    
+    \vspace{0.25cm}
+    
+    \universityFull\\
+    (\universityShort)
+    
+    \vspace{3cm}
+    
+    Кафедра \department
+    
+    \vspace{1 cm}
+    
+    \textbf{\workType}
+    
+    \vspace{0.2cm}
+    
+    по дисциплине
+    
+    \discipline
+    
+    \vspace{0.05cm}
+    
+    на тему
+    
+    \textbf{«\theme»}
+    
+    \vspace{6cm}
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+        Выполнил: студент группы \group\ факультета \faculty & \student\\
+        Проверил: \supervisorDegree & \supervisor\\
+    \end{tabular*}
+    \vfill
+    
+    \city\ \docyear
+    
+\end{titlepage}
+} 

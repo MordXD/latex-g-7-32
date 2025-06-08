@@ -1,0 +1,135 @@
+% tables-style.sty - Стилевой файл для оформления таблиц по ГОСТ 7-32-2017
+%
+% Данный стилевой файл содержит настройки для оформления
+% таблиц в соответствии с ГОСТ 7-32-2017.
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gost-7-32-table-style}[2024/03/10 v1.0 Table style for GOST 7-32-2017]
+
+% Загружаем необходимые пакеты
+\RequirePackage{longtable}
+\RequirePackage{multirow}
+\RequirePackage{array}
+\RequirePackage{caption}
+\RequirePackage{booktabs}
+\RequirePackage{colortbl}
+\RequirePackage{makecell}
+
+% Настройка подписей таблиц
+\captionsetup[table]{
+  format=plain,       % Простой формат (без рамок)
+  labelformat=default, % Стандартное форматирование метки
+  labelsep=endash,    % Разделитель между номером и заголовком - длинное тире
+  justification=raggedright, % Выравнивание подписи по левому краю
+  singlelinecheck=false, % Отключаем центрирование для одной строки
+  font={normalsize},  % Размер шрифта для подписи
+  labelfont={normalsize}, % Размер шрифта для номера таблицы
+  skip=10pt,          % Расстояние до таблицы
+  position=top,       % Располагать подпись над таблицей
+  margin=0pt          % Убираем отступ слева
+}
+
+% Настройка плавающих объектов
+\floatplacement{table}{ht!} % Поместить таблицу здесь (h) или вверху страницы (t)
+
+% Оформление вертикальных линий
+\def\thickhline{\noalign{\hrule height 0.8pt}}
+
+% Общие параметры для всех таблиц
+\def\tablerule{\noalign{\hrule height 0.6pt}}
+
+% Команды для создания простых таблиц
+\newcommand{\simptable}[4]{%
+  \begin{table}[ht]
+    \centering
+    \caption{#1}
+    \label{tab:#2}
+    \begin{tabular}{#3}
+      \hline
+      #4
+      \hline
+    \end{tabular}
+  \end{table}
+}
+
+% Команды для создания таблиц заданной ширины
+\newenvironment{widetable}[4]{%
+  \begin{table}[ht]
+    \centering
+    \caption{#1}
+    \label{tab:#2}
+    \begin{tabular*}{\textwidth}{#3}
+      \hline
+}{%
+      \hline
+    \end{tabular*}
+  \end{table}
+}
+
+% Окружение для длинных таблиц
+\newenvironment{longtab}[4]{%
+  \begin{center}
+    \begin{longtable}{#3}
+      \caption{#1\label{tab:#2}}\\
+      \hline
+      #4
+      \hline \endfirsthead
+      \caption*{Продолжение таблицы \ref{tab:#2}}\\
+      \hline
+      #4
+      \hline \endhead
+      \hline
+      \multicolumn{\LT@cols}{r}{\textit{Продолжение на следующей странице}}
+      \endfoot
+      \hline
+      \endlastfoot
+}{%
+    \end{longtable}
+  \end{center}
+}
+
+% Команда для короткой записи ячеек с выравниванием по вертикали
+\renewcommand\theadfont{\normalsize\bfseries}
+
+% Определение новых типов колонок
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}  % Выравнивание влево
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}    % Выравнивание по центру
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}   % Выравнивание вправо
+
+% Команда для заголовков с вращением на 90 градусов
+\newcommand{\gostrothead}[1]{\rotatebox{90}{\theadfont #1}}
+
+% Команда для кратких заголовков колонок
+\newcommand{\shorthead}[1]{\thead{#1}}
+
+% Команда для центрированной ячейки с точным размером
+\newcommand{\cmakecell}[1]{\makecell{#1}}
+
+% Дополнительные цвета для оформления таблиц
+\definecolor{tableheadcolor}{rgb}{0.9,0.9,0.9}
+\definecolor{tablerowcolor}{rgb}{0.95,0.95,0.95}
+
+% Команда для создания заголовка с цветом фона
+\newcommand{\headcell}[1]{%
+  \cellcolor{tableheadcolor}\thead{#1}%
+}
+
+% Макрос для создания таблицы с чередующимися цветами строк
+\newenvironment{zebratable}[4]{%
+  \begin{table}[ht]
+    \centering
+    \caption{#1}
+    \label{tab:#2}
+    \rowcolors{2}{white}{tablerowcolor}
+    \begin{tabular}{#3}
+      \rowcolor{tableheadcolor}
+      #4 \\
+      \hline
+}{%
+      \hline
+    \end{tabular}
+  \end{table}
+}
+
+\endinput

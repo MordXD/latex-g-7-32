@@ -1,0 +1,1272 @@
+\documentclass[14pt, a4paper]{styles/gost-7-32} % Используем ГОСТ-класс (возможно, article-based)
+
+% --- Пакеты ---
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{grffile}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb} % amsmath нужен для \eqref, \text, \SI и др.
+\usepackage{siunitx}
+\usepackage{circuitikz}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath} % Добавлен для cases
+
+% --- Настройки пакетов ---
+\graphicspath{{images/}} % Папка для изображений
+
+% Настройка siunitx
+\sisetup{
+  output-decimal-marker={,},
+  exponent-product = \cdot,
+  complex-root-position = before-number,
+  output-complex-root = j
+}
+\DeclareSIUnit{\simens}{См} % Определяем сименс
+
+% Настройка circuitikz
+\ctikzset{voltage dir=RP} % Направление стрелки напряжения по ГОСТ
+
+% Настройка listings
+\lstdefinestyle{scilab}{
+  language=Scilab,
+  basicstyle=\small\ttfamily,
+  breaklines=true,
+  commentstyle=\color{green!50!black},
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=10pt,
+  tabsize=4,
+  showspaces=false,
+  showstringspaces=false,
+  frame=single,
+  captionpos=b,
+  backgroundcolor=\color{yellow!10},
+  inputencoding=utf8,
+  extendedchars=true,
+  literate={+}{{$+$}}1 {/}{{$/$}}1 {*}{{$*$}}1 {=}{{$=$}}1
+           {>}{{$>$}}1 {<}{{$<$}}1 {\\}{{$\backslash$}}1
+           {~}{{$\sim$}}1 {-}{{-}}1
+           {^}{{$^\wedge$}}1
+           {а}{{\cyra}}1 {б}{{\cyrb}}1 {в}{{\cyrv}}1 {г}{{\cyrg}}1 {д}{{\cyrd}}1 {е}{{\cyre}}1 {ё}{{\"e}}1
+           {ж}{{\cyrzh}}1 {з}{{\cyrz}}1 {и}{{\cyri}}1 {й}{{\cyrishrt}}1 {к}{{\cyrk}}1 {л}{{\cyrl}}1 {м}{{\cyrm}}1
+           {н}{{\cyrn}}1 {о}{{\cyro}}1 {п}{{\cyrp}}1 {р}{{\cyrr}}1 {с}{{\cyrs}}1 {т}{{\cyrt}}1 {у}{{\cyru}}1
+           {ф}{{\cyrf}}1 {х}{{\cyrh}}1 {ц}{{\cyrc}}1 {ч}{{\cyrch}}1 {ш}{{\cyrsh}}1 {щ}{{\cyrshch}}1 {ъ}{{\cyrhrdsn}}1
+           {ы}{{\cyrery}}1 {ь}{{\cyrsftsn}}1 {э}{{\cyrerev}}1 {ю}{{\cyryu}}1 {я}{{\cyrya}}1
+           {А}{{\CYRA}}1 {Б}{{\CYRB}}1 {В}{{\CYRV}}1 {Г}{{\CYRG}}1 {Д}{{\CYRD}}1 {Е}{{\CYRE}}1 {Ё}{{\"E}}1
+           {Ж}{{\CYRZH}}1 {З}{{\CYRZ}}1 {И}{{\CYRI}}1 {Й}{{\CYRISHRT}}1 {К}{{\CYRK}}1 {Л}{{\CYRL}}1 {М}{{\CYRM}}1
+           {Н}{{\CYRN}}1 {О}{{\CYRO}}1 {П}{{\CYRP}}1 {Р}{{\CYRR}}1 {С}{{\CYRS}}1 {Т}{{\CYRT}}1 {У}{{\CYRU}}1
+           {Ф}{{\CYRF}}1 {Х}{{\CYRH}}1 {Ц}{{\CYRC}}1 {Ч}{{\CYRCH}}1 {Ш}{{\CYRSH}}1 {Щ}{{\CYRSHCH}}1 {Ъ}{{\CYRHRDSN}}1
+           {Ы}{{\CYRERY}}1 {Ь}{{\CYRSFTSN}}1 {Э}{{\CYREREV}}1 {Ю}{{\CYRYU}}1 {Я}{{\CYRYA}}1
+           {°}{\ensuremath{^\circ}}1
+}
+\lstset{style=scilab} % Применяем стиль по умолчанию
+
+% --- Прочие настройки ---
+\onehalfspacing % Полуторный интервал
+
+% --- Пользовательские команды ---
+% Кириллические символы
+\DeclareRobustCommand{\g}{\ensuremath{\text{г}}}
+\DeclareRobustCommand{\G}{\ensuremath{\text{Г}}}
+
+% Безопасная вставка изображений
+\newcommand{\safeincludegraphics}[2][]{%
+  \IfFileExists{#2}{%
+    \includegraphics[#1]{#2}%
+  }{%
+    \fbox{\parbox{0.8\textwidth}{\centering ИЗОБРАЖЕНИЕ ОТСУТСТВУЕТ\\\texttt{#2}}}%
+  }%
+}
+
+% Тип колонки для таблиц
+%\newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
+
+% Макросы для титульного листа
+\newcommand{\ministry}{}
+\newcommand{\universityFull}{}
+\newcommand{\universityShort}{}
+\newcommand{\faculty}{СиСС} % Исправлено
+\newcommand{\department}{Теории электрических цепей}
+\newcommand{\workType}{Курсовая работаfа}
+\newcommand{\discipline}{Теоретические основы электротехники}
+\newcommand{\theme}{Расчет разветвленных цепей постоянного и синусоидального тока}
+\newcommand{\variant}{15}
+\newcommand{\student}{}
+\newcommand{\group}{}
+\newcommand{\supervisorDegree}{д.т.н.}
+\newcommand{\supervisor}{]
+\newcommand{\city}{Москва}
+\newcommand{\docyear}{2025}
+
+% Макросы для комплексных чисел
+\newcommand{\complex}[2]{{#1} + j{#2}}
+\newcommand{\phasor}[2]{{#1} \angle {#2}^\circ}
+\newcommand{\modulus}[1]{|{#1}|}
+\newcommand{\phase}[1]{\arg({#1})}
+
+% --- Настройка hyperref (предполагается, что пакет уже загружен классом) ---
+% \usepackage[unicode, pdftex]{hyperref} % Не загружаем явно
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={\theme},
+    pdfpagemode=UseOutlines,
+    pdfauthor={\student},
+    bookmarksnumbered=true,
+    bookmarksopen=true,
+    pdflang={ru}
+}
+% --- Конец преамбулы ---
+
+\begin{document}
+
+% --- Титульный лист (если используется макет класса gost-7-32) ---
+% \maketitle % Или специфичные команды для титульника из класса
+
+\newpage % Переход на новую страницу перед основным текстом
+
+% --- Задачи оформлены через \section, \subsection, \subsubsection ---
+
+\section{Задача 1. Расчет резистивных цепей постоянного тока}
+
+\subsection{Исходные данные и параметры схемы}
+Номер варианта $N = 15$.
+Исходная схема резистивной цепи для варианта 15 представлена на рисунке~\ref{fig:task1_initial_scheme}.
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig1.jpg}
+  \caption{Резистивная цепь для 15 варианта}
+  \label{fig:task1_initial_scheme}
+\end{figure}
+
+Параметры элементов схемы:
+\begin{itemize}
+    \item $N = 15$
+    \item $R_1 = 1 + N = 1 + 15 = \SI{126}{\ohm}$
+    \item $R_2 = 2 + N = 2 + 15 = \SI{17}{\ohm}$
+    \item $R_3 = 3 + N = 3 + 15 = \SI{18}{\ohm}$
+    \item $R_4 = 4 + N = 4 + 15 = \SI{19}{\ohm}$
+    \item $E_1 = 10 + N = 10 + 15 = \SI{25}{\volt}$
+    \item $E_2 = 5 + N = 5 + 15 = \SI{20}{\volt}$
+\end{itemize}
+
+\subsection{Решение методом уравнений Кирхгофа}
+Для удобства объединим элементы $R_3$ и $R_4$, получим элемент с общим сопротивлением $R_{34} = R_3 + R_4 = 18 + 19 = \SI{37}{\ohm}$. Укажем направление токов в ветвях ($I_1, I_2, I_3$) и направления обходов контуров (рис.~\ref{fig:task1_kirchhoff}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig2.jpg}
+  \caption{Резистивная цепь с выбранными направлениями токов и обходов контуров}
+  \label{fig:task1_kirchhoff}
+\end{figure}
+
+Для начала, определим кол-во уравнений для первого и второго законов Кирхгофа.
+Кол-во уравнений для первого закона определяется формулой:
+Кол-во узлов – 1 = $2 - 1 = 1$.
+Кол-во уравнений для второго закона определяется формулой:
+$-1 \cdot (\text{кол-во уравнений для ПЗК}) + \text{кол-во источников тока} + \text{кол-во ветвей} = -1 + 0 + 3 = 2$.
+
+Теперь составим уравнение по первому закону Кирхгофа, где алгебраическая сумма токов равна 0. За обозначения тока возьмем условную 1 (единицу). Если ток входит в узел, то берется со знаком плюс, в противном случае - со знаком минус. В нашем случае будет (для верхнего узла):
+\begin{equation}
+    I_1 + I_2 - I_3 = 0
+    \label{eq:kirchhoff1_1}
+\end{equation}
+
+Составим уравнения для второго закона Кирхгофа, где алгебраическая сумма напряжений на резистивных элементах равна алгебраической сумме ЭДС в контуре. Если направление тока или ЭДС совпадает с направлением обхода контура, то берем со знаком плюс, иначе – минус.
+\begin{itemize}
+    \item Для левого контура получим:
+      \begin{equation}
+          I_1 R_1 - I_2 R_2 = -E_1 - E_2
+          \label{eq:kirchhoff1_2}
+      \end{equation}
+    \item Для правого контура:
+      \begin{equation}
+          I_2 R_2 + I_3 R_{34} = E_2
+          \label{eq:kirchhoff1_3}
+      \end{equation}
+\end{itemize}
+
+Подставив все значения, получаем систему:
+\begin{equation}
+    \begin{cases}
+        I_1 + I_2 - I_3 = 0 \\
+        16 I_1 - 17 I_2 = -45 \\
+        17 I_2 + 37 I_3 = 20
+    \end{cases}
+    \label{eq:system_kirchhoff1}
+\end{equation}
+
+На основе этих уравнений составим матрицы. Решим данную СЛАУ с помощью пакета математических программ Scilab.
+Матрица коэффициентов $A$ и вектор свободных членов $B$:
+\begin{equation*}
+    A = \begin{bmatrix}
+        1 & 1 & -1 \\
+        16 & -17 & 0 \\
+        0 & 17 & 37
+    \end{bmatrix}, \quad
+    B = \begin{bmatrix}
+        0 \\ -45 \\ 20
+    \end{bmatrix}
+\end{equation*}
+
+\begin{lstlisting}[caption=Решение СЛАУ методом Кирхгофа (Scilab), label=lst:scilab_kirchhoff1]
+    // Задаём матрицы A и B
+    A = [1, 1, -1; 16, -17, 0; 0, 17, 37];
+    B = [0; -45; 20];
+    
+    // Решаем систему X = A \ B
+    I = linsolve(A, B);
+    
+    // Вывод результатов
+    printf("Токи (метод Кирхгофа):\n");
+    printf("I1 = %.3f А\n", I(1));
+    printf("I2 = %.3f А\n", I(2));
+    printf("I3 = %.3f А\n", I(3));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    Токи (метод Кирхгофа):\\
+    I1 = -1.400 А\\
+    I2 = 1.329 А\\
+    I3 = -0.071 А
+      }}
+      \caption{Вывод Scilab для метода Кирхгофа (DC)}
+      \label{fig:scilab_kirchhoff1_out}
+    \end{figure}
+
+Решив матрицу, получаем:
+\begin{itemize}
+    \item $I_1 \approx \SI{-1.399}{\ampere}$
+    \item $I_2 \approx \SI{1.329}{\ampere}$
+    \item $I_3 \approx \SI{-0.071}{\ampere}$
+\end{itemize}
+Ток может получиться отрицательный. Это будет значить лишь то, что направление тока изначально было указано неверно и в этом нет ничего страшного.
+
+\subsection{Решение методом контурных токов}
+Суть метода контурных токов состоифт в том, что в каждом независимым контуре схемы течет свой контурный ток. Выделяем два контура и указываем направление токов $I_{11}$ и $I_{22}$ (рис.~\ref{fig:task1_mesh}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig4.jpg}
+  \caption{Резистивная цепь с выбранными направлениями токов и обходов контуров}
+  \label{fig:task1_mesh}
+\end{figure}
+
+Сначала рассмотрим левый (первый) контур. Общий ток контура обозначим как $I_{11}$. Его эквивалентное сопротивление будет равно: $R_{11} = R_1 + R_2 = 16 + 17 = \SI{33}{\ohm}$.
+Составим уравнение, где сумма произведения контурного тока $I_{11}$ на эквивалентное сопротивление контура и произведения смежного резистора $R_2$ на ток $I_{22}$ равна алгебраической сумме ЭДС, то есть:
+\begin{equation}
+    I_{11} (R_1 + R_2) - I_{22} R_2 = -E_2 - E_1
+\end{equation}
+Ток $I_{22}$ берется с минусом, т.к. направления обхода контуров одинаковое и ток будет идти через этот резистор в разные стороны.
+
+Аналогично делаем для второго контура, где контурный ток обозначим за $I_{22}$ и получим:
+\begin{equation}
+    I_{22} (R_2 + R_{34}) - I_{11} R_2 = E_2
+\end{equation}
+Его эквивалентное сопротивление $R_{22} = R_2 + R_{34} = 17 + 37 = \SI{54}{\ohm}$. Общее сопротивление $R_{12} = R_{21} = R_2 = \SI{17}{\ohm}$.
+
+Подставив все значения, получаем систему:
+\begin{equation}
+    \begin{cases}
+        33 I_{11} - 17 I_{22} = -45 \\
+        -17 I_{11} + 54 I_{22} = 20
+    \end{cases}
+    \label{eq:system_mesh}
+\end{equation}
+
+Составим и решим матрицу из двух уравнений, составленных с помощью второго закона Кирхгофа.
+
+\begin{lstlisting}[caption=Решение СЛАУ методом контурных токов (Scilab), label=lst:scilab_mesh1]
+// Задание матрицы R и вектора E
+R = [33, -17; -17, 54];
+E = [-45; 20];
+
+// Решение системы I = R \ E
+I_mesh = R \ E;
+
+// Вывод контурных токов
+printf("Контурные токи:\n");
+printf("I11 = %.7f А\n", I_mesh(1));
+printf("I22 = %.7f А\n", I_mesh(2));
+\end{lstlisting}
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.8\textwidth}{\centering \texttt{SCILAB Output (Fig 5)} \\ \texttt{I11 = -1.3998660} \\ \texttt{I22 = -0.0703282}}}
+  \caption{Решение СЛАУ с помощью матричного способа (Пример)}
+  \label{fig:task1_mesh_solve}
+\end{figure}
+
+
+Контурные токи:
+\begin{itemize}
+    \item $I_{11} \approx \SI{-1.399866}{\ampere}$
+    \item $I_{22} \approx \SI{-0.070328}{\ampere}$
+\end{itemize}
+
+Ток, протекающий только в одном контуре, равен контурному, записывается со знаком минус, если направление обхода тока не со направлено:
+\begin{itemize}
+    \item $I_1 = -I_{11} \approx \SI{1.399}{\ampere}$
+    \item $I_3 = -I_{22} \approx \SI{0.071}{\ampere}$
+\end{itemize}
+
+Токи, протекающие через общие сопротивления, определяем, как алгебраическую сумму контурных, учитывая направление обхода. Исходя из этого найдем $I_2$:
+\begin{equation}
+    I_2 = -I_{11} + I_{22} = -(-1.399866) + (-0.070328) \approx \SI{1.3295}{\ampere}
+\end{equation}
+
+В итоге получаем:
+\begin{itemize}
+    \item $I_1 \approx \SI{1.399}{\ampere}$
+    \item $I_2 \approx \SI{1.329}{\ampere}$
+    \item $I_3 \approx \SI{0.071}{\ampere}$
+\end{itemize}
+
+\subsection{Метод узловых потенциалов}
+При расчете электрической цепи методом узловых потенциалов определяются потенциалы узлов цепи, а затем по закону Ома токи в ее ветвях. Метод целесообразно применять в тех случаях, когда число узлов цели меньше или равно числу независимых контуров этой цепи.
+Произвольно выбираем направление всех токов в ветвях на исходной схеме (рис.~\ref{fig:task1_nodal}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig6.jpg}
+  \caption{Резистивная цепь с выбранными направлениями действительных и контурных токов}
+  \label{fig:task1_nodal}
+\end{figure}
+
+Число уравнений:
+\[
+  y = N_{\text{у}} - N_{\text{И}} - 1
+    = 2 - 0 - 1
+    = 1,
+\]
+где $N_{\text{у}}$ — число узлов, $N_{\text{И}}$ — число источников идеального тока.
+
+Принимаем потенциал узла~$A$ равным нулю, то есть $\varphi_A = 0$. Найдём проводимости ветвей:
+\begin{itemize}
+  \item $G_1 = \dfrac1{R_1} = \dfrac1{16} = \SI{0.0625}{\simens}$,
+  \item $G_{34} = \dfrac1{R_3 + R_4} = \dfrac1{37} \approx \SI{0.02703}{\simens}$,
+  \item $G_2 = \dfrac1{R_2} = \dfrac1{17} \approx \SI{0.05882}{\simens}$.
+\end{itemize}
+
+
+Составим узловое уравнение для узла В:
+\begin{equation}
+    \varphi_B (G_1 + G_2 + G_{34}) - \varphi_A (G_1 + G_2 + G_{34}) = -E_2 G_2 + E_1 G_1
+\end{equation}
+Так как $\varphi_A = 0$, то:
+\begin{equation}
+    \varphi_B = \frac{E_1 G_1 - E_2 G_2}{G_1 + G_2 + G_{34}}
+\end{equation}
+
+Подставив числовые значения получим:
+\begin{equation*}
+    \varphi_B = \frac{25 \cdot \frac{1}{16} - 20 \cdot \frac{1}{17}}{\frac{1}{16} + \frac{1}{17} + \frac{1}{37}} \approx \frac{1.5625 - 1.17647}{0.0625 + 0.05882 + 0.02703} = \frac{0.38603}{0.14835} \approx \SI{2.60214}{\volt}
+\end{equation*}
+
+Теперь найдем токи в ветвях:
+\begin{itemize}
+    \item $I_1 = \frac{\varphi_A - \varphi_B + E_1}{R_1} = \frac{0 - 2.60214 + 25}{16} \approx \SI{1.399}{\ampere}$
+    \item $I_2 = \frac{\varphi_B - \varphi_A + E_2}{R_2} = \frac{2.60214 - 0 + 20}{17} \approx \SI{1.329}{\ampere}$
+    \item $I_3 = \frac{\varphi_B - \varphi_A}{R_{34}} = \frac{2.60214 - 0}{37} \approx \SI{0.071}{\ampere}$
+\end{itemize}
+
+\subsection{Метод двух узлов}
+Метод двух узлов это частный случай метода узловых потенциалов.
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig66.jpg} % Используем ту же схему, что и для узловых потенциалов
+  \caption{Схема для метода двух узлов}
+  \label{fig:task1_twonode}
+\end{figure}
+Напряжение между узлами $U_{ab}$ (где 'a' - верхний узел B, 'b' - нижний узел A) находится по формуле:
+\begin{equation}
+    U_{ab} = \frac{\sum E_k g_k}{\sum g_k}
+\end{equation}
+Проводимости ветвей:
+$g_1 = 1/R_1 = 1/16 = \SI{0.0625}{\simens}$
+$g_2 = 1/R_2 = 1/17 \approx \SI{0.05882}{\simens}$
+$g_3 = 1/R_{34} = 1/37 \approx \SI{0.02703}{\simens}$.
+
+Для расчета $U_{ab}$ учтем направления ЭДС относительно обхода (E1 берем со знаком «-», так как направление ЭДС не совпадает с направлением обхода от узла 'b' к 'a' через первую ветвь, а E2 совпадает, значит «+»):
+\[
+ U_{ab}
+ = \frac{-E_1 g_1 + E_2 g_2}{g_1 + g_2 + g_3}
+ = \frac{-25 \cdot \tfrac1{16} + 20 \cdot \tfrac1{17}}
+        {\tfrac1{16} + \tfrac1{17} + \tfrac1{37}}
+ \approx \frac{-1.5625 + 1.17647}{0.14835}
+ = -2.60214 \text{ В}
+\]
+
+Теперь находим токи:
+\begin{itemize}
+    \item $I_1 = (-E_1 - U_{ab}) g_1 = (-25 - (-2.60214)) \cdot (1/16) = (-22.39786) / 16 \approx \SI{-1.39987}{\ampere}$
+    \item $I_2 = (E_2 - U_{ab}) g_2 = (20 - (-2.60214)) \cdot (1/17) = (22.60214) / 17 \approx \SI{1.32954}{\ampere}$
+    \item $I_3 = U_{ab} g_3 = -2.60214 \cdot (1/37) \approx \SI{-0.07033}{\ampere}$
+\end{itemize}
+Результаты совпадают с методом Кирхгофа.
+
+\subsection{Решение методом наложения}
+Суть метода наложения заключается в том, что необходимо рассмотреть цепь в нескольких вариациях с одним источником ЭДС, посчитать токи и алгебраически их сложить.
+
+\subsubsection{Расчет для источника E1 (E2 закорочен)}
+Рассмотрим цепь только с E1 (рис.~\ref{fig:task1_superposition_e1}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig7.jpg}
+  \caption{Цепь №1 только с Е1}
+  \label{fig:task1_superposition_e1}
+\end{figure}
+
+Решим данную цепь с помощью уравнений Кирхгофа.
+ПЗК (верхний узел): $I'_2 - I'_1 - I'_3 = 0$.
+ВЗК:
+\begin{itemize}
+    \item Левый контур (против часовой стрелки): $-I'_1 R_1 - I'_2 R_2 = -E_1$
+    \item Правый контур (против часовой стрелки): $I'_2 R_2 + I'_3 R_{34} = 0$
+\end{itemize}
+Система:
+\begin{equation}
+    \begin{cases}
+        -16 I'_1 - 17 I'_2 = -25 \\
+        17 I'_2 + 37 I'_3 = 0 \\
+        -I'_1 + I'_2 - I'_3 = 0
+    \end{cases}
+    \label{eq:system_superposition_e1}
+\end{equation}
+Решим СЛАУ с помощью Scilab.
+
+\begin{lstlisting}[caption=Решение СЛАУ для E1 (Scilab), label=lst:scilab_superposition_e1]
+// Параметры
+E1 = 25; R1 = 16; R2 = 17; R34 = 37;
+// Матрица A и вектор B для системы -16*I1' - 17*I2' = -E1; 17*I2' + 37*I3' = 0; -I1' + I2' - I3' = 0
+A = [-16, -17, 0; 0, 17, 37; -1, 1, -1];
+B = [-E1; 0; 0];
+// Решение
+I_prime = linsolve(A, B);
+printf("Частичные токи от E1:\n");
+printf("I1' = %.7f А\n", I_prime(1));
+printf("I2' = %.7f А\n", I_prime(2));
+printf("I3' = %.7f А\n", I_prime(3));
+\end{lstlisting}
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.8\textwidth}{\centering \texttt{SCILAB Output (Fig 8)} \\ \texttt{I1' = 0.9042197} \\ \texttt{I2' = 0.6195579} \\ \texttt{I3' = -0.2846618}}}
+  \caption{Решение СЛАУ с помощью матричного способа (Пример)}
+  \label{fig:task1_superposition_e1_solve}
+\end{figure}
+
+Получаем:
+\begin{itemize}
+    \item $I'_1 \approx \SI{0.9042197}{\ampere}$
+    \item $I'_2 \approx \SI{0.6195579}{\ampere}$
+    \item $I'_3 \approx \SI{-0.2846618}{\ampere}$
+\end{itemize}
+Знак – у токов означает, что токи направлены в противоположную сторону.
+
+\subsubsection{Расчет для источника E2 (E1 закорочен)}
+Рассмотрим цепь только с Е2 (рис.~\ref{fig:task1_superposition_e2}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig9.jpg}
+  \caption{Цепь №2 только с Е2}
+  \label{fig:task1_superposition_e2}
+\end{figure}
+
+Решим данную цепь с помощью уравнений Кирхгофа.
+ПЗК (верхний узел): $I''_2 - I''_1 - I''_3 = 0$.
+ВЗК:
+\begin{itemize}
+    \item Левый контур (против часовой стрелки): $-I''_1 R_1 - I''_2 R_2 = -E_2$
+    \item Правый контур (против часовой стрелки): $I''_2 R_2 + I''_3 R_{34} = E_2$
+\end{itemize}
+Система:
+\begin{equation}
+    \begin{cases}
+        -16 I''_1 - 17 I''_2 = -20 \\
+        17 I''_2 + 37 I''_3 = 20 \\
+        -I''_1 + I''_2 - I''_3 = 0
+    \end{cases}
+    \label{eq:system_superposition_e2}
+\end{equation}
+Решим СЛАУ с помощью Scilab.
+
+\begin{lstlisting}[caption=Решение СЛАУ для E2 (Scilab), label=lst:scilab_superposition_e2]
+// Параметры
+E2 = 20; R1 = 16; R2 = 17; R34 = 37;
+// Матрица A и вектор B для системы -16*I1'' - 17*I2'' = -E2; 17*I2'' + 37*I3'' = E2; -I1'' + I2'' - I3'' = 0
+A = [-16, -17, 0; 0, 17, 37; -1, 1, -1];
+B = [-E2; E2; 0];
+// Решение
+I_double_prime = linsolve(A, B);
+printf("Частичные токи от E2:\n");
+printf("I1'' = %.7f А\n", I_double_prime(1));
+printf("I2'' = %.7f А\n", I_double_prime(2));
+printf("I3'' = %.7f А\n", I_double_prime(3));
+\end{lstlisting}
+
+\begin{figure}[H]
+  \centering
+  \fbox{\parbox{0.8\textwidth}{\centering \texttt{SCILAB Output (Fig 10)} \\ \texttt{I1'' = 0.4956463} \\ \texttt{I2'' = 0.7099799} \\ \texttt{I3'' = 0.2143336}}}
+  \caption{Решение СЛАУ с помощью матричного способа (Пример)}
+  \label{fig:task1_superposition_e2_solve}
+\end{figure}
+
+Получаем:
+\begin{itemize}
+    \item $I''_1 \approx \SI{0.4956463}{\ampere}$
+    \item $I''_2 \approx \SI{0.7099799}{\ampere}$
+    \item $I''_3 \approx \SI{0.2143336}{\ampere}$
+\end{itemize}
+
+\subsubsection{Определение результирующих токов}
+Теперь найдем значение токов $I_1-I_3$. При сложении частичных токов учтем их направления относительно первоначально выбранных на рис.~\ref{fig:task1_kirchhoff}. Если направление совпадает, ток берется со знаком «+», иначе – со знаком «-».
+\begin{itemize}
+    \item $I_1 = I'_1 + I''_1 = 0.9042197 + 0.4956463 \approx \SI{1.39987}{\ampere}$
+    \item $I_2 = I'_2 + I''_2 = 0.6195579 + 0.7099799 \approx \SI{1.32954}{\ampere}$
+    \item $I_3 = -I'_3 + I''_3 = -(-0.2846618) + 0.2143336 \approx \SI{-0.07033}{\ampere}$
+\end{itemize}
+
+Окончательно имеем:
+\begin{itemize}
+    \item $I_1 \approx \SI{1.399}{\ampere}$
+    \item $I_2 \approx \SI{1.329}{\ampere}$
+    \item $I_3 \approx \SI{-0.071}{\ampere}$
+\end{itemize}
+
+\subsection{Расчет тока R1 методом эквивалентного генератора}
+Суть метода эквивалентного генератора состоит в нахождении тока в одной выделенной ветви, при этом остальная часть сложной электрической цепи заменяется эквивалентным ЭДС $E_{экв}$, с её внутренним сопротивлением $R_{экв}$.
+Объединим $R_3$ и $R_4$ в элемент с сопротивлением $R_{34} = \SI{37}{\ohm}$. Схема для определения параметров в режиме холостого хода показана на рис.~\ref{fig:task1_thevenin_xx}.
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig11.jpg}
+  \caption{Цепь без первой ветви в режиме холостого хода}
+  \label{fig:task1_thevenin_xx}
+\end{figure}
+
+Найдем эквивалентное сопротивление: так как $R_{34}$ и $R_2$ соединены параллельно:
+\begin{equation}
+    R_{экв} = \frac{R_2 R_{34}}{R_2 + R_{34}} = \frac{17 \cdot 37}{17 + 37} \approx \SI{11.65}{\ohm}
+\end{equation}
+
+Чтобы посчитать эквивалентный ЭДС необходимо рассмотреть цепь в режиме холостого хода. Напряжение холостого хода, будет равно эквивалентной ЭДС $E_{экв}$.
+\begin{equation}
+    E_{экв} = U_{xx} = \frac{-E_2 R_{34}}{R_2 + R_{34}} = \frac{-20 \cdot 37}{17 + 37} \approx \SI{-13.7}{\volt}
+\end{equation}
+
+Отсюда можем найти ток в первой ветви $I_1$:
+\begin{equation}
+    I_1 = \frac{E_1 - E_{экв}}{R_{экв} + R_1} = \frac{25 - (-13.7)}{11.65 + 16} = \frac{38.7}{27.65} \approx \SI{1.399}{\ampere}
+\end{equation}
+
+\subsection{Расчет баланса мощностей}
+Баланс мощностей – это выражение закона сохранения энергии, в электрической цепи.
+Определение баланса мощностей звучит так: сумма мощностей, потребляемых приемниками, равна сумме мощностей, отдаваемых источниками:
+\begin{equation*}
+    \sum P_{потр.} = \sum P_{ист.}
+\end{equation*}
+Схема для расчета показана на рис.~\ref{fig:task1_balance}.
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task1_fig2.jpg}
+  \caption{Резистивная цепь}
+  \label{fig:task1_balance}
+\end{figure}
+
+Если направление ЭДС и направление тока ветви не совпадают, то составляющая мощности этого источника в балансе мощностей берется со знаком «-».
+Используем токи, полученные ранее (например, методом наложения или контурных токов):
+$I_1 \approx \SI{1.399}{\ampere}$, $I_2 \approx \SI{1.329}{\ampere}$, $I_3 \approx \SI{0.071}{\ampere}$.
+Формула баланса:
+\begin{equation}
+    I_1^2 R_1 + I_2^2 R_2 + I_3^2 R_{34} = E_1 I_1 + E_2 I_2
+\end{equation}
+Подставляем значения:
+$1.399^2 \cdot 16 + 1.329^2 \cdot 17 + 0.071^2 \cdot 37 = 25 \cdot 1.399 + 20 \cdot 1.329$
+$\SI{61.527}{W} \approx \SI{61.555}{W}$
+Баланс мощностей сошёлся.
+
+Проверка с помощью пакета математических программ Scilab:
+\begin{lstlisting}[caption=Расчет баланса мощностей (Scilab, Рис. 13), label=lst:scilab_balance1]
+    // Точные токи из метода Кирхгофа/Контурных токов
+    I1 = -1.399866; I2 = 1.329538; I3 = -0.070328;
+    R1 = 16; R2 = 17; R3 = 18; R4 = 19; R34 = R3 + R4;
+    E1 = 25; E2 = 20;
+    
+    // Мощность потребителей
+    Ppotr = I1^2*R1 + I2^2*R2 + I3^2*R34;
+    
+    // Мощность источников (алгебраическая сумма E*I)
+    Pist = E1*I1 + E2*I2;
+    
+    // Проверка стандартного баланса P_gen = P_load
+    P_gen  = E1*I1 + E2*I2;
+    P_load = I1^2*R1 + I2^2*R2 + I3^2*R34;
+    
+    // Вывод результатов
+    printf("Ppotr   = %.7f W\n", Ppotr);
+    printf("Pist    = %.7f W\n", Pist);
+    printf("P_gen   = %.7f W\n", P_gen);
+    printf("P_load  = %.7f W\n", P_load);
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    Ppotr   = 61.5269285 W\\
+    Pist    = 61.5547006 W\\
+    P_gen   = 61.5547006 W\\
+    P_load  = 61.5269285 W
+      }}
+      \caption{Вывод Scilab при проверке баланса мощностей}
+      \label{fig:balance_power_output}
+    \end{figure}
+Баланс мощностей сошёлся и примерно равен нашим значениям, подсчитанным ранее.
+
+% --- Задача 2 ---
+\section{Задача 2. Расчет разветвленных цепей синусоидального тока}
+
+\subsection{Расчет параметров элементов схемы}
+Исходная схема цепи синусоидального тока представлена на рисунке~\ref{fig:task2_initial_scheme}.
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.7\textwidth]{task2_fig14.jpg}
+  \caption{Разветвленная цепь синусоидального тока}
+  \label{fig:task2_initial_scheme}
+\end{figure}
+
+Параметры элементов схемы:
+\begin{itemize}
+    \item $f = \SI{50}{\hertz}$
+    \item $E_1 = \SI{100}{\volt}$ (Действующее значение, фаза 0) $\implies \dot{E}_1 = 100 \angle 0^\circ = \SI{100}{\volt}$
+    \item $E_2 = 50 \cdot e^{j 150^\circ} \si{\volt}$ (Действующее значение) $\implies \dot{E}_2 = 50 \angle 150^\circ \si{\volt} \approx \complex{-43.301}{25} \si{\volt}$
+    \item $R_1 = \SI{16}{\ohm}$
+    \item $R_2 = \SI{17}{\ohm}$
+    \item $R_3 = \SI{20}{\ohm}$
+    \item $L_2 = \SI{21}{\milli\henry} = \SI{0.021}{\henry}$
+    \item $L_3 = \SI{25}{\milli\henry} = \SI{0.025}{\henry}$
+    \item $C_1 = \SI{215}{\micro\farad} = \SI{215e-6}{\farad}$
+\end{itemize}
+
+\subsection{Решение методом уравнений Кирхгофа}
+Выберем произвольно направление токов ($\dot{I}_1, \dot{I}_2, \dot{I}_3$) и направление обходов контуров (рис.~\ref{fig:task2_kirchhoff}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.7\textwidth]{task2_fig15.jpg}
+  \caption{Цепь с выбранными направлениями токов и обходов в контурах}
+  \label{fig:task2_kirchhoff}
+\end{figure}
+
+Для начала, определим кол-во уравнений для первого и второго законов Кирхгофа.
+Кол-во уравнений для первого закона: Кол-во узлов – 1 = $2 - 1 = 1$.
+Кол-во уравнений для второго закона: $-1 \cdot (\text{ПЗК}) + \text{Ист. тока} + \text{Ветви} = -1 + 0 + 3 = 2$.
+
+Теперь составим уравнение по первому закону Кирхгофа для верхнего узла:
+\begin{equation}
+    \dot{I}_1 + \dot{I}_2 - \dot{I}_3 = 0
+    \label{eq:kirchhoff2_1}
+\end{equation}
+
+Составим уравнения для второго закона Кирхгофа.
+\begin{itemize}
+    \item Для левого контура (обход против часовой стрелки):
+      \begin{equation}
+          Z_1 \dot{I}_1 + Z_3 \dot{I}_3 = \dot{E}_1
+          \label{eq:kirchhoff2_2}
+      \end{equation}
+    \item Для правого контура (обход против часовой стрелки):
+      \begin{equation}
+          -Z_2 \dot{I}_2 - Z_3 \dot{I}_3 = -\dot{E}_2
+          \label{eq:kirchhoff2_3}
+      \end{equation}
+\end{itemize}
+Объединим все в систему:
+\begin{equation}
+    \begin{cases}
+        \dot{I}_1 + \dot{I}_2 - \dot{I}_3 = 0 \\
+        Z_1 \dot{I}_1 + Z_3 \dot{I}_3 = \dot{E}_1 \\
+        -Z_2 \dot{I}_2 - Z_3 \dot{I}_3 = -\dot{E}_2
+    \end{cases}
+    \label{eq:system_kirchhoff2}
+\end{equation}
+
+Запишем угловую частоту и комплексное сопротивление для реактивных элементов:
+$\omega = 2 \pi f = 2 \pi \cdot 50 \approx \SI{314.159}{\radian\per\second}$
+$Z_{C1} = \frac{1}{j\omega C_1} = \frac{-j}{314.159 \cdot 215 \times 10^{-6}} \approx -j \num{14.805} \si{\ohm}$
+$Z_{L2} = j \omega L_2 = j \cdot 314.159 \cdot 0.021 \approx j \num{6.597} \si{\ohm}$
+$Z_{L3} = j \omega L_3 = j \cdot 314.159 \cdot 0.025 \approx j \num{7.854} \si{\ohm}$
+
+Полные комплексные сопротивления ветвей:
+$Z_1 = R_1 + Z_{C1} = 16 - j 14.805 \si{\ohm}$
+$Z_2 = R_2 + Z_{L2} = 17 + j 6.597 \si{\ohm}$
+$Z_3 = R_3 + Z_{L3} = 20 + j 7.854 \si{\ohm}$
+
+Подставим значения в систему:
+\begin{equation*}
+    \begin{cases}
+        \dot{I}_1 + \dot{I}_2 - \dot{I}_3 = 0 \\
+        (16 - j 14.805) \dot{I}_1 + (20 + j 7.854) \dot{I}_3 = 100 \\
+        -(17 + j 6.597) \dot{I}_2 - (20 + j 7.854) \dot{I}_3 = - (50 \angle 150^\circ)
+    \end{cases}
+\end{equation*}
+
+Решим систему с помощью Scilab.
+\begin{lstlisting}[caption=Решение СЛАУ для AC-цепи методом Кирхгофа (Scilab), label=lst:scilab_kirchhoff2]
+    E1 = 100;
+    E2 = 50*exp(%i*150*%pi/180);
+    R1 = 16; R2 = 17; R3 = 20;
+    L2 = 0.021; L3 = 0.025; C1 = 0.000215;
+    f = 50; w = 2*%pi*f;
+    
+    Zc1 = -%i/(w*C1);
+    Zl2 =  %i*w*L2;
+    Zl3 =  %i*w*L3;
+    Z1  = R1 + Zc1;
+    Z2  = R2 + Zl2;
+    Z3  = R3 + Zl3;
+    
+    A = [1  1  -1;
+         Z1 0   Z3;
+         0  -Z2 -Z3];
+    B = [0; E1; -E2];
+    
+    I = linsolve(A, B);
+    printf("I1 = %.7f + %.7fj А\n", real(I(1)), imag(I(1)));
+    printf("I2 = %.7f + %.7fj А\n", real(I(2)), imag(I(2)));
+    printf("I3 = %.7f + %.7fj А\n", real(I(3)), imag(I(3)));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    I1 = 2.4002814 + 1.8352980j А\\
+    I2 = -0.8040669 - 2.1535598j А\\
+    I3 = 1.5962145 - 0.3182619j А
+      }}
+      \caption{Вывод Scilab для метода Кирхгофа (AC)}
+      \label{fig:scilab_kirchhoff2_out}
+    \end{figure}
+
+Решив матрицу, получаем:
+\begin{itemize}
+    \item $\dot{I}_1 \approx \complex{2.4002814}{1.8352980} \si{\ampere}$
+    \item $\dot{I}_2 \approx \complex{-0.8040669}{-2.1535598} \si{\ampere}$
+    \item $\dot{I}_3 \approx \complex{1.5962145}{-0.3182619} \si{\ampere}$
+\end{itemize}
+
+Векторная диаграмма для токов $\dot{I}_1, \dot{I}_2, \dot{I}_3$ показана на рис.~\ref{fig:task2_vector_diagram}.
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.8\textwidth]{task2_fig17.jpg}
+  \caption{Векторная диаграмма для токов I1, I2, I3}
+  \label{fig:task2_vector_diagram}
+\end{figure}
+
+\subsection{Решение методом контурных токов}
+Суть метода контурных токов состоит в том, что в каждом независимым контуре схемы течет свой контурный ток. Выделяем два контура и указываем направление токов $\dot{I}_{11}$ и $\dot{I}_{22}$ (рис.~\ref{fig:task2_mesh}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.7\textwidth]{task2_fig18.jpg}
+  \caption{Цепь с выбранными направлениями токов и обходов в контурах}
+  \label{fig:task2_mesh}
+\end{figure}
+
+Определяем собственные сопротивления контуров:
+\begin{itemize}
+    \item $Z_{11} = Z_1 + Z_3 = (16 - j 14.805) + (20 + j 7.854) = 36 - j 6.951 \si{\ohm}$
+    \item $Z_{22} = Z_2 + Z_3 = (17 + j 6.597) + (20 + j 7.854) = 37 + j 14.451 \si{\ohm}$
+    \item $Z_{12} = Z_{21} = Z_3 = 20 + j 7.854 \si{\ohm}$
+\end{itemize}
+
+Запишем второй закон Кирхгофа для данной цепи:
+\begin{equation}
+    \begin{cases}
+        \dot{I}_{11} Z_{11} - \dot{I}_{22} Z_{12} = \dot{E}_1 \\
+        -\dot{I}_{11} Z_{21} + \dot{I}_{22} Z_{22} = -\dot{E}_2
+    \end{cases}
+    \label{eq:system_mesh2}
+\end{equation}
+
+Подставим значения и получим:
+\begin{equation}
+    \begin{cases}
+        (36 - j 6.951) \dot{I}_{11} - (20 + j 7.854) \dot{I}_{22} = 100 \\
+        -(20 + j 7.854) \dot{I}_{11} + (37 + j 14.451) \dot{I}_{22} = - (50 \angle 150^\circ)
+    \end{cases}
+    \label{eq:system_mesh2_values}
+\end{equation}
+
+Решим систему с помощью Scilab.
+\begin{lstlisting}[caption=Решение СЛАУ методом контурных токов (Scilab), label=lst:scilab_mesh2]
+    E1 = 100;
+    E2 = 50*exp(%i*150*%pi/180);
+    R1 = 16; R2 = 17; R3 = 20;
+    L2 = 0.021; L3 = 0.025; C1 = 0.000215;
+    f = 50; w = 2*%pi*f;
+    
+    Zc1 = -%i/(w*C1);
+    Zl2 =  %i*w*L2;
+    Zl3 =  %i*w*L3;
+    Z1  = R1 + Zc1;
+    Z2  = R2 + Zl2;
+    Z3  = R3 + Zl3;
+    
+    Z11 = Z1 + Z3;
+    Z22 = Z2 + Z3;
+    Z12 = Z3; Z21 = Z3;
+    
+    A = [Z11  -Z12;
+         -Z21  Z22];
+    B = [E1; -E2];
+    
+    I_mesh = linsolve(A, B);
+    I1 = I_mesh(1);
+    I2 = I_mesh(2);
+    I3 = I1 - I2;
+    
+    printf("I1 = %.7f + %.7fj А\n", real(I1), imag(I1));
+    printf("I2 = %.7f + %.7fj А\n", real(I2), imag(I2));
+    printf("I3 = %.7f + %.7fj А\n", real(I3), imag(I3));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    I1 = 2.4002814 + 1.8352980j А\\
+    I2 = 0.8040669 + 2.1535598j А\\
+    I3 = 1.5962145 - 0.3182618j А
+      }}
+      \caption{Вывод Scilab для метода контурных токов (AC)}
+      \label{fig:scilab_mesh2_out}
+    \end{figure}
+
+Контурные токи (из Scilab):
+$\dot{I}_{11} \approx \complex{2.4002814}{1.8352980} \si{\ampere}$
+$\dot{I}_{22} \approx \complex{0.8040669}{2.1535598} \si{\ampere}$
+
+Определим токи ветвей:
+\begin{itemize}
+    \item $\dot{I}_1 = \dot{I}_{11} \approx \complex{2.4002814}{1.8352980} \si{\ampere}$
+    \item $\dot{I}_2 = \dot{I}_{22} \approx \complex{0.8040669}{2.1535598} \si{\ampere}$
+    \item $\dot{I}_3 = \dot{I}_{11} - \dot{I}_{22} \approx (2.40028 + j 1.83530) - (0.80407 + j 2.15356) \approx \complex{1.59621}{-0.31826} \si{\ampere}$
+\end{itemize}
+
+\subsection{Метод узловых потенциалов}
+Обозначим узлы цепи буквами V1 (нижний) и V2 (верхний).
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.7\textwidth]{task2_fig155.jpg}
+  \caption{Схема для метода узловых потенциалов (узлы V1, V2)}
+  \label{fig:task2_nodal_v}
+\end{figure}
+Сопротивления ветвей: $Z_1 = R_1 + Z_{C1}$, $Z_2 = R_2 + Z_{L2}$, $Z_3 = R_3 + Z_{L3}$.
+Приравняем $V_1 = 0$. Составим уравнение относительно $V_2$:
+\begin{equation}
+    V_2 \left(\frac{1}{Z_1} + \frac{1}{Z_2} + \frac{1}{Z_3}\right) = -\frac{E_2}{Z_2} - \frac{E_1}{Z_1}
+\end{equation}
+$V_2 = \frac{-E_1/Z_1 - E_2/Z_2}{1/Z_1 + 1/Z_2 + 1/Z_3}$.
+Вычисление дает: $V_2 \approx \complex{-34.423787}{-6.1714163} \si{\volt}$.
+
+Далее выражаем токи через $V_2$:
+\begin{itemize}
+    \item $\dot{I}_1 = \frac{V_2 + E_1}{Z_1} \approx \complex{2.4002706}{1.8353039} \si{\ampere}$
+    \item $\dot{I}_2 = \frac{V_2 + E_2}{Z_2} \approx \complex{-0.8040612}{-2.1535629} \si{\ampere}$
+    \item $\dot{I}_3 = \frac{-V_2}{Z_3} \approx \complex{1.5962094}{-0.3182590} \si{\ampere}$
+\end{itemize}
+Результаты совпадают с методом Кирхгофа.
+
+\subsection{Решение методом двух узлов}
+Суть метода двух узлов состоит в том, что нужно принять потенциал одного из узлов равному нулю и найти напряжения в цепи, как значения потенциала второго узла, отличного от нуля.
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.7\textwidth]{task2_fig15.jpg}
+  \caption{Цепь с выбранными направлениями токов}
+  \label{fig:task2_twonode_ac}
+\end{figure}
+
+Выберем узел A (нижний) и заземлим его, $\varphi_A = 0$. Напряжение $U_{BA} = \varphi_B$.
+Найдем проводимость каждой из ветвей $Y_k = 1/Z_k$:
+$Y_1 = \frac{1}{Z_1} = \frac{1}{16 - j 14.805} \approx \complex{0.03367}{0.03115} \si{\simens}$
+$Y_3 = \frac{1}{Z_3} = \frac{1}{20 + j 7.854} \approx \complex{0.04331}{-0.01701} \si{\simens}$
+$Y_2 = \frac{1}{Z_2} = \frac{1}{17 + j 6.597} \approx \complex{0.05112}{-0.01984} \si{\simens}$
+
+Составим узловое уравнение для узла B:
+\begin{equation}
+    \varphi_B (Y_1 + Y_2 + Y_3) = -\dot{E}_1 Y_1 - \dot{E}_2 Y_2
+\end{equation}
+$\varphi_B = \frac{-\dot{E}_1 Y_1 - \dot{E}_2 Y_2}{Y_1 + Y_2 + Y_3}$
+
+Посчитаем потенциал $\varphi_B$ и найдём токи с помощью Scilab.
+\begin{lstlisting}[caption=Код решения методом двух узлов (Scilab), label=lst:scilab_twonode]
+    E1 = 100;
+    E2 = 50*exp(%i*150*%pi/180);
+    R1 = 16; R2 = 17; R3 = 20;
+    L2 = 0.021; L3 = 0.025; C1 = 0.000215;
+    f = 50; w = 2*%pi*f;
+    
+    Zc1 = -%i/(w*C1);
+    Zl2 =  %i*w*L2;
+    Zl3 =  %i*w*L3;
+    Z1  = R1 + Zc1;
+    Z2  = R2 + Zl2;
+    Z3  = R3 + Zl3;
+    
+    Y1 = 1/Z1; Y2 = 1/Z2; Y3 = 1/Z3;
+    Vb = (-E1*Y1 - E2*Y2)/(Y1 + Y2 + Y3);
+    
+    I1 = (E1 - Vb)*Y1;
+    I2 = (-E2 - Vb)*Y2;
+    I3 = Vb*Y3;
+    
+    printf("I1 = %.7f + %.7fj А\n", real(I1), imag(I1));
+    printf("I2 = %.7f + %.7fj А\n", real(I2), imag(I2));
+    printf("I3 = %.7f + %.7fj А\n", real(I3), imag(I3));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    I1 = 2.4002814 + 1.8352980j А\\
+    I2 = -0.8040669 - 2.1535598j А\\
+    I3 = 1.5962145 - 0.3182619j А
+      }}
+      \caption{Вывод Scilab для метода двух узлов (AC)}
+      \label{fig:scilab_twonode_out}
+    \end{figure}
+
+Получаем следующие значения токов:
+\begin{itemize}
+    \item $\dot{I}_1 \approx \complex{2.4002814}{1.8352980} \si{\ampere}$
+    \item $\dot{I}_2 \approx \complex{-0.8040669}{-2.1535598} \si{\ampere}$
+    \item $\dot{I}_3 \approx \complex{1.5962145}{-0.3182619} \si{\ampere}$
+\end{itemize}
+Результаты совпадают с методом Кирхгофа.
+
+\subsection{Решение методом наложения}
+Суть метода наложения заключается в том, что необходимо рассмотреть цепь в нескольких вариациях с одним источником ЭДС, посчитать токи и алгебраически их сложить.
+
+\subsubsection{Расчет для источника E1 (E2 закорочен)}
+Рассмотрим цепь только с E1 (рис.~\ref{fig:task2_superposition_e1}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.7\textwidth]{task2_fig22.jpg}
+  \caption{Цепь с одним источником ЭДС Е1}
+  \label{fig:task2_superposition_e1}
+\end{figure}
+
+Посчитаем значения токов $\dot{I}'_1, \dot{I}'_2, \dot{I}'_3$. Воспользуемся законами Кирхгофа.
+ПЗК (узел B): $\dot{I}'_1 + \dot{I}'_2 - \dot{I}'_3 = 0$.
+ВЗК:
+\begin{equation*}
+    \begin{cases}
+        \dot{I}'_1 Z_1 + \dot{I}'_3 Z_3 = \dot{E}_1 \\
+        -\dot{I}'_3 Z_3 - \dot{I}'_2 Z_2 = 0
+    \end{cases}
+\end{equation*}
+Решим СЛАУ с помощью Scilab.
+
+\begin{lstlisting}[caption=Расчет частичных токов от E1 (Scilab), label=lst:scilab_super1]
+    E1 = 100;
+    R1 = 16; R2 = 17; R3 = 20;
+    L2 = 0.021; L3 = 0.025; C1 = 0.000215; f = 50;
+    w  = 2*%pi*f;
+    
+    Zc1 = -%i/(w*C1);
+    Zl2 =  %i*w*L2;
+    Zl3 =  %i*w*L3;
+    Z1  = R1 + Zc1;
+    Z2  = R2 + Zl2;
+    Z3  = R3 + Zl3;
+    
+    A = [1  1  -1;
+         Z1 0   Z3;
+         0  -Z2 -Z3];
+    B = [0; E1; 0];
+    
+    I = linsolve(A, B);
+    printf("I1' = %.7f + %.7fj А\n", real(I(1)), imag(I(1)));
+    printf("I2' = %.7f + %.7fj А\n", real(I(2)), imag(I(2)));
+    printf("I3' = %.7f + %.7fj А\n", real(I(3)), imag(I(3)));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    I1' = 3.3127516 + 1.4755123j А\\
+    I2' = -1.7904957 - 0.8014460j А\\
+    I3' = 1.5222559 + 0.6740662j А
+      }}
+      \caption{Вывод Scilab для суперпозиции E1 (AC)}
+      \label{fig:scilab_super1_out}
+    \end{figure}
+
+В результате выполнения команд получаем токи:
+\begin{itemize}
+    \item $\dot{I}'_1 \approx \complex{3.3127516}{1.4755123} \si{\ampere}$
+    \item $\dot{I}'_2 \approx \complex{-1.7904957}{-0.8014460} \si{\ampere}$
+    \item $\dot{I}'_3 \approx \complex{1.5222559}{0.6740662} \si{\ampere}$
+\end{itemize}
+
+\subsubsection{Расчет для источника E2 (E1 закорочен)}
+Теперь рассмотрим цепь только с источником ЭДС E2 (рис.~\ref{fig:task2_superposition_e2}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.7\textwidth]{task2_fig24.jpg}
+  \caption{Цепь с одним источником ЭДС Е2}
+  \label{fig:task2_superposition_e2}
+\end{figure}
+
+Посчитаем значения токов $\dot{I}''_1, \dot{I}''_2, \dot{I}''_3$. Воспользуемся законами Кирхгофа.
+ПЗК (узел B): $\dot{I}''_1 + \dot{I}''_2 - \dot{I}''_3 = 0$.
+ВЗК:
+\begin{equation*}
+    \begin{cases}
+        \dot{I}''_1 Z_1 + \dot{I}''_3 Z_3 = 0 \\
+        -\dot{I}''_3 Z_3 - \dot{I}''_2 Z_2 = -\dot{E}_2
+    \end{cases}
+\end{equation*}
+Решим СЛАУ с помощью Scilab.
+
+\begin{lstlisting}[caption=Расчет частичных токов от E2 (Scilab), label=lst:scilab_super2]
+    E2 = 50*exp(%i*150*%pi/180);
+    R1 = 16; R2 = 17; R3 = 20;
+    L2 = 0.021; L3 = 0.025; C1 = 0.000215; f = 50;
+    w  = 2*%pi*f;
+    
+    Zc1 = -%i/(w*C1);
+    Zl2 =  %i*w*L2;
+    Zl3 =  %i*w*L3;
+    Z1  = R1 + Zc1;
+    Z2  = R2 + Zl2;
+    Z3  = R3 + Zl3;
+    
+    A = [1  1  -1;
+         Z1 0   Z3;
+         0  -Z2 -Z3];
+    B = [0; 0; -E2];
+    
+    I = linsolve(A, B);
+    printf("I1'' = %.7f + %.7fj А\n", real(I(1)), imag(I(1)));
+    printf("I2'' = %.7f + %.7fj А\n", real(I(2)), imag(I(2)));
+    printf("I3'' = %.7f + %.7fj А\n", real(I(3)), imag(I(3)));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    I1'' = -0.9124702 + 0.3597857j А\\
+    I2'' = 0.9864288 - 1.3521138j А\\
+    I3'' = 0.0739586 - 0.9923281j А
+      }}
+      \caption{Вывод Scilab для суперпозиции E2 (AC)}
+      \label{fig:scilab_super2_out}
+    \end{figure}
+
+В результате выполнения команд получаем токи:
+\begin{itemize}
+    \item $\dot{I}''_1 \approx \complex{-0.9124702}{0.3597857} \si{\ampere}$
+    \item $\dot{I}''_2 \approx \complex{0.9864288}{-1.3521138} \si{\ampere}$
+    \item $\dot{I}''_3 \approx \complex{0.0739586}{-0.9923281} \si{\ampere}$
+\end{itemize}
+
+\subsubsection{Определение результирующих токов}
+Теперь получим значения токов $\dot{I}_1, \dot{I}_2, \dot{I}_3$ путем сложения частичных токов:
+\begin{itemize}
+    \item $\dot{I}_1 = \dot{I}'_1 + \dot{I}''_1 = (3.3127516 + j 1.4755123) + (-0.9124702 + j 0.3597857) \approx \complex{2.40028}{1.83530} \si{\ampere}$
+    \item $\dot{I}_2 = \dot{I}'_2 + \dot{I}''_2 = (-1.7904957 - j 0.8014460) + (0.9864288 - j 1.3521138) \approx \complex{-0.80407}{-2.15356} \si{\ampere}$
+    \item $\dot{I}_3 = \dot{I}'_3 + \dot{I}''_3 = (1.5222559 + j 0.6740662) + (0.0739586 - j 0.9923281) \approx \complex{1.59621}{-0.31826} \si{\ampere}$
+\end{itemize}
+Окончательный ответ:
+\begin{itemize}
+    \item $\dot{I}_1 \approx \complex{2.40028}{1.83529} \si{\ampere}$
+    \item $\dot{I}_2 \approx \complex{-0.80406}{-2.15355} \si{\ampere}$
+    \item $\dot{I}_3 \approx \complex{1.59621}{-0.31826} \si{\ampere}$
+\end{itemize}
+Результаты совпадают с методом Кирхгофа.
+
+\subsection{Расчёт тока I1 методом эквивалентного генератора}
+Суть метода эквивалентного генератора состоит в нахождении тока в одной выделенной ветви, при этом остальная часть сложной электрической цепи заменяется эквивалентным ЭДС $\dot{E}_{экв}$, с её внутренним сопротивлением $\dot{Z}_{экв}$.
+
+\subsubsection{Расчет эквивалентных параметров}
+Чтобы посчитать эквивалентное сопротивление оставшейся цепи, необходимо рассмотреть её без первой ветви (рис.~\ref{fig:task2_thevenin}).
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.6\textwidth]{task2_fig26.jpg}
+  \caption{Цепь без первой ветви в режиме холостого хода}
+  \label{fig:task2_thevenin}
+\end{figure}
+
+Рассчитаем эквивалентное сопротивление: $Z_2$ и $Z_3$ параллельны.
+\begin{equation}
+    Z_{экв} = \frac{Z_2 Z_3}{Z_2 + Z_3} = \frac{(17 + j 6.597)(20 + j 7.854)}{(17 + j 6.597) + (20 + j 7.854)} \approx \complex{9.18923}{3.58562} \si{\ohm}
+\end{equation}
+
+Чтобы посчитать напряжение между узлами A и B ($U_{xx}$), необходимо рассмотреть цепь в режиме холостого хода. $\dot{E}_{экв} = U_{xx} = U_{BA}$.
+Используем следующую формулу для $\dot{E}_{экв}$:
+\begin{equation}
+ \dot{E}_{экв} = \varphi_B = \frac{-\dot{E}_2 Y_2}{Y_2 + Y_3} \approx \complex{-18.947851}{19.300076} \si{\volt}
+\end{equation}
+где $Y_k = 1/Z_k$.
+
+\subsubsection{Расчет тока I1}
+Найдем значение искомого тока $\dot{I}_1$ по следующей формуле:
+\begin{equation}
+    \dot{I}_1 = \frac{\dot{E}_1 + \dot{E}_{экв}}{Z_{экв} + Z_1}
+\end{equation}
+Решение с помощью Scilab.
+\begin{lstlisting}[caption=Решение для I1 методом эквивалентного генератора (Scilab), label=lst:scilab_thevenin]
+    E1 = 100;
+    E2 = 50*exp(%i*150*%pi/180);
+    R1 = 16; R2 = 17; R3 = 20;
+    L2 = 0.021; L3 = 0.025; C1 = 0.000215; f = 50;
+    w  = 2*%pi*f;
+    
+    Zc1 = -%i/(w*C1);
+    Zl2 =  %i*w*L2;
+    Zl3 =  %i*w*L3;
+    Z1  = R1 + Zc1;
+    Z2  = R2 + Zl2;
+    Z3  = R3 + Zl3;
+    
+    Y2 = 1/Z2; Y3 = 1/Z3;
+    Zekv  = (Z2*Z3)/(Z2+Z3);
+    Eekv  = (-E2*Y2)/(Y2+Y3);
+    
+    I1 = (E1 + Eekv)/(Zekv + Z1);
+    printf("I1 = %.7f + %.7fj А\n", real(I1), imag(I1));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+      \centering
+      \fbox{\parbox{0.8\textwidth}{\ttfamily
+    I1 = 2.4002814 + 1.8352979j А
+      }}
+      \caption{Вывод Scilab для метода эквивалентного генератора (AC)}
+      \label{fig:scilab_thevenin_out}
+    \end{figure}
+В итоге получаем:
+$\dot{I}_1 \approx \complex{2.4002814}{1.8352979} \si{\ampere}$.
+
+\subsubsection{График мгновенного тока i1(t) и АЧХ/ФЧХ}
+График мгновенного тока $i_1(t)$ для ветви 1 построен на интервале 0 – 0,06 с.
+Формула: $i_1(t) = \sqrt{2} |\dot{I}_1| \cos(\omega t + \varphi_{I1})$.
+Амплитуда тока: $I_{1m} = \sqrt{2} |\dot{I}_1| \approx \SI{4.273}{\ampere}$ (приблизительно $\approx 4.2$ А).
+Фаза: $\varphi_{I1} \approx \SI{0.6528}{\radian} \approx 37.4^\circ$ (приблизительно $\approx 0.65$ рад ($37^\circ$)).
+\begin{equation}
+    i_1(t) \approx 4.2 \cos(100\pi t + 0.65) \si{\ampere}
+\end{equation}
+График показан на рис.~\ref{fig:task2_i1_graph}.
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.9\textwidth]{task2_fig28.jpg}
+  \caption{График мгновенного тока $i_1(t)$}
+  \label{fig:task2_i1_graph}
+\end{figure}
+
+АЧХ и ФЧХ эквивалентного сопротивления $Z_{экв}$ (вид со стороны ветви 1) в зависимости от частоты:
+\begin{equation}
+    Z_{экв}(\omega) = \frac{Z_2(\omega) Z_3(\omega)}{Z_2(\omega) + Z_3(\omega)} = \frac{(R_2 + j \omega L_2)(R_3 + j \omega L_3)}{(R_2+R_3) + j \omega (L_2+L_3)}
+\end{equation}
+Графики АЧХ ($|Z_{экв}(f)|$) и ФЧХ ($\arg(Z_{экв}(f))$) представлены на рис.~\ref{fig:task2_freq_resp}.
+
+\begin{figure}[H]
+  \centering
+  \safeincludegraphics[width=0.9\textwidth]{task2_ach.jpg}
+  \safeincludegraphics[width=0.9\textwidth]{task2_fch.jpg}
+  \caption{АЧХ (сверху) и ФЧХ (снизу) эквивалентного сопротивления $Z_{экв}$ (ось частот логарифмическая)}
+  \label{fig:task2_freq_resp}
+\end{figure}
+
+\subsection{Расчёт баланса мощностей}
+Проверим выполнение баланса мощностей: $\sum \dot{S}_{ист.} = \sum \dot{S}_{потр.}$.
+Мощность источника: $\dot{S}_{E} = \dot{E} \cdot \dot{I}^*_{вых}$.
+Мощность потребителя: $\dot{S}_{Z} = Z \cdot |\dot{I}|^2$.
+
+Используем токи из метода Кирхгофа:
+$\dot{I}_1 \approx \complex{2.40028}{1.83530} \si{\ampere}$
+$\dot{I}_2 \approx \complex{-0.80407}{-2.15356} \si{\ampere}$
+$\dot{I}_3 \approx \complex{1.59621}{-0.31826} \si{\ampere}$
+
+Проверка с помощью пакета математических программ Scilab.
+\begin{lstlisting}[caption=Расчет баланса мощностей (Scilab), label=lst:scilab_balance2]
+    E1 = 100;
+    E2 = 50*exp(%i*150*%pi/180);
+    R1 = 16; R2 = 17; R3 = 20;
+    L2 = 0.021; L3 = 0.025; C1 = 0.000215; f = 50;
+    w  = 2*%pi*f;
+    
+    Zc1 = -%i/(w*C1);
+    Zl2 =  %i*w*L2;
+    Zl3 =  %i*w*L3;
+    Z1  = R1 + Zc1;
+    Z2  = R2 + Zl2;
+    Z3  = R3 + Zl3;
+    
+    // Токи из метода Кирхгофа
+    I1 = 2.4002814 + 1.8352980*%i;
+    I2 = -0.8040669 - 2.1535598*%i;
+    I3 = 1.5962145 - 0.3182619*%i;
+    
+    // Мощность источников
+    SE1 = E1 * conj(I1);
+    SE2 = E2 * conj(-I2);
+    S_src = SE1 + SE2;
+    
+    // Мощность потребителей
+    SZ1 = Z1 * abs(I1)^2;
+    SZ2 = Z2 * abs(I2)^2;
+    SZ3 = Z3 * abs(I3)^2;
+    S_load = SZ1 + SZ2 + SZ3;
+    
+    // Вывод
+    printf("Sum S_ист. = %.4f + j %.4f VA\n", real(S_src),  imag(S_src));
+    printf("Sum S_потр. = %.4f + j %.4f VA\n", real(S_load), imag(S_load));
+    \end{lstlisting}
+    
+    \begin{figure}[H]
+        \centering
+        \fbox{%
+          \parbox{0.9\linewidth}{\raggedright\ttfamily
+      Sum S\_ист. = 134.9400 + j 136.9764 VA\\
+      Sum S\_потр. = 134.9399 + j 136.9758 VA
+          }%
+        }
+        \caption{Вывод Scilab для баланса мощностей (AC)}
+        \label{fig:scilab_balance2_out}
+      \end{figure}
+      
+Результаты расчета Scilab:
+\begin{itemize}
+    \item $\sum \dot{S}_{ист.} \approx \complex{134.9400}{136.9764} \si{VA}$
+    \item $\sum \dot{S}_{потр.} \approx \complex{134.9399}{136.9758} \si{VA}$
+\end{itemize}
+Баланс мощностей сошёлся.
+
+\end{document}

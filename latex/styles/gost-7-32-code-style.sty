@@ -1,0 +1,194 @@
+% gost-7-32-code-style.sty - Стилевой файл для оформления кода по ГОСТ 7-32-2017
+%
+% Данный стилевой файл содержит настройки для оформления
+% программного кода в соответствии с ГОСТ 7-32-2017.
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gost-7-32-code-style}[2024/03/10 v1.1 Code formatting for GOST 7-32-2017]
+
+% Загружаем необходимые пакеты
+\RequirePackage{listings}
+\RequirePackage{color}
+\RequirePackage{xcolor}
+\RequirePackage{textcomp}
+
+% Определение цветов для подсветки синтаксиса
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+% Настройка оформления кода через listings
+\lstdefinestyle{gost732style}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\footnotesize\ttfamily,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=t,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    % Параметры рамки будут установлены через \AtBeginDocument
+    % Поддержка кириллицы
+    literate={а}{{\selectfont\char224}}1
+             {б}{{\selectfont\char225}}1
+             {в}{{\selectfont\char226}}1
+             {г}{{\selectfont\char227}}1
+             {д}{{\selectfont\char228}}1
+             {е}{{\selectfont\char229}}1
+             {ё}{{\selectfont\char184}}1
+             {ж}{{\selectfont\char230}}1
+             {з}{{\selectfont\char231}}1
+             {и}{{\selectfont\char232}}1
+             {й}{{\selectfont\char233}}1
+             {к}{{\selectfont\char234}}1
+             {л}{{\selectfont\char235}}1
+             {м}{{\selectfont\char236}}1
+             {н}{{\selectfont\char237}}1
+             {о}{{\selectfont\char238}}1
+             {п}{{\selectfont\char239}}1
+             {р}{{\selectfont\char240}}1
+             {с}{{\selectfont\char241}}1
+             {т}{{\selectfont\char242}}1
+             {у}{{\selectfont\char243}}1
+             {ф}{{\selectfont\char244}}1
+             {х}{{\selectfont\char245}}1
+             {ц}{{\selectfont\char246}}1
+             {ч}{{\selectfont\char247}}1
+             {ш}{{\selectfont\char248}}1
+             {щ}{{\selectfont\char249}}1
+             {ъ}{{\selectfont\char250}}1
+             {ы}{{\selectfont\char251}}1
+             {ь}{{\selectfont\char252}}1
+             {э}{{\selectfont\char253}}1
+             {ю}{{\selectfont\char254}}1
+             {я}{{\selectfont\char255}}1
+             {А}{{\selectfont\char192}}1
+             {Б}{{\selectfont\char193}}1
+             {В}{{\selectfont\char194}}1
+             {Г}{{\selectfont\char195}}1
+             {Д}{{\selectfont\char196}}1
+             {Е}{{\selectfont\char197}}1
+             {Ё}{{\selectfont\char168}}1
+             {Ж}{{\selectfont\char198}}1
+             {З}{{\selectfont\char199}}1
+             {И}{{\selectfont\char200}}1
+             {Й}{{\selectfont\char201}}1
+             {К}{{\selectfont\char202}}1
+             {Л}{{\selectfont\char203}}1
+             {М}{{\selectfont\char204}}1
+             {Н}{{\selectfont\char205}}1
+             {О}{{\selectfont\char206}}1
+             {П}{{\selectfont\char207}}1
+             {Р}{{\selectfont\char208}}1
+             {С}{{\selectfont\char209}}1
+             {Т}{{\selectfont\char210}}1
+             {У}{{\selectfont\char211}}1
+             {Ф}{{\selectfont\char212}}1
+             {Х}{{\selectfont\char213}}1
+             {Ц}{{\selectfont\char214}}1
+             {Ч}{{\selectfont\char215}}1
+             {Ш}{{\selectfont\char216}}1
+             {Щ}{{\selectfont\char217}}1
+             {Ъ}{{\selectfont\char218}}1
+             {Ы}{{\selectfont\char219}}1
+             {Ь}{{\selectfont\char220}}1
+             {Э}{{\selectfont\char221}}1
+             {Ю}{{\selectfont\char222}}1
+             {Я}{{\selectfont\char223}}1
+}
+
+% Настройка для различных языков программирования
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    style=gost732style,
+    morekeywords={self, if, else, return, try, except, raise, finally, None, True, False}
+}
+
+\lstdefinestyle{cppstyle}{
+    language=C++,
+    style=gost732style,
+    morekeywords={nullptr, const, override, auto, constexpr}
+}
+
+\lstdefinestyle{csharpstyle}{
+    language=[Sharp]C,
+    style=gost732style,
+    morekeywords={var, async, await, using, get, set, where, select, from, new}
+}
+
+\lstdefinestyle{javastyle}{
+    language=Java,
+    style=gost732style,
+    morekeywords={ArrayList, StringBuilder, Override, implements, extends, null}
+}
+
+% Добавляем стиль для языка Scilab
+\lstdefinelanguage{Scilab}{%
+    morekeywords={function, endfunction, if, then, else, elseif, end, for, while, select, case, break, return, try, catch, clear, clf, plot, title, xlabel, ylabel, grid, legend, scf, linspace, ones, sqrt, atan, sin, cos, tan},
+    sensitive=true,
+    comment=[l]{//},
+    morestring=[b]',
+    morestring=[b]"
+}
+
+\lstdefinestyle{scilabstyle}{%
+    style=gost732style,
+    language=Scilab
+}
+
+% Добавляем стиль для MATLAB
+\lstdefinestyle{matlabstyle}{%
+    language=Matlab,
+    style=gost732style
+}
+
+% Окончательная настройка стиля после загрузки всех пакетов
+\AtBeginDocument{%
+  % Установка стиля по умолчанию
+  \lstset{style=gost732style}
+  
+  % Явное установление настроек рамки для кода
+  \lstset{
+    frame=single,
+    framerule=0.4pt,
+    framesep=3pt,
+    xleftmargin=8pt,
+    xrightmargin=8pt
+  }
+}
+
+% Определение команды для оформления кода прямо в тексте
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Определение окружения для алгоритмов
+\newenvironment{algorithm}[1][\unskip]{%
+    \begin{center}
+    \begin{minipage}{0.95\textwidth}
+    \begin{enumerate}
+    \setlength{\itemsep}{0.5em}
+}{%
+    \end{enumerate}
+    \end{minipage}
+    \end{center}
+}
+
+% Определение команды Code для совместимости
+\newenvironment{Code}{\begin{lstlisting}}{\end{lstlisting}}
+
+% Команда для вставки кода из файла
+\newcommand{\lstinputfile}[3][]{\lstinputlisting[style=#2,caption={#3},#1]}
+
+% Команда для выбора языка по умолчанию
+\newcommand{\setdefaultcodelanguage}[1]{\lstset{language=#1}}
+
+\endinput

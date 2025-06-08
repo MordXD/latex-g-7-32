@@ -1,0 +1,107 @@
+% gost-7-32-sections.sty - Стилевой файл для оформления разделов по ГОСТ 7-32-2017
+%
+% Данный стилевой файл содержит настройки для оформления
+% специальных разделов (Введение, Заключение, Список вопросов) в соответствии с ГОСТ 7-32-2017.
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gost-7-32-sections}[2024/03/10 v1.0 Special sections formatting for GOST 7-32-2017]
+
+% Загружаем необходимые пакеты
+\RequirePackage{titlesec}
+
+% Настройка внешнего вида обычных заголовков разделов выполняется
+% через \AtBeginDocument для обеспечения правильного применения настроек
+\AtBeginDocument{%
+  % По ГОСТ заголовки обычных разделов выровнены по левому краю
+  \titleformat{\section}[block]{\bfseries\raggedright}{\thesection.}{0.5em}{}[]
+  \titlespacing{\section}{1.25cm}{0.5em}{0cm}
+  
+  \titleformat{\subsection}[runin]{\normalsize \bfseries}{\thesubsection}{0.5em}{}[\newline \indent]
+  \titlespacing{\subsection}{1.25cm}{0.5em}{0cm}
+  
+  \titleformat{\subsubsection}[runin]{\normalsize \bfseries}{\thesubsubsection}{0.5em}{}[\newline \indent]
+  \titlespacing{\subsubsection}{1.25cm}{0.5em}{0cm}
+}
+
+% Команда для оформления введения
+\newcommand{\introduction}{%
+    \clearpage%
+    \phantomsection%
+    \addcontentsline{toc}{section}{ВВЕДЕНИЕ}%
+    \begin{center}%
+    \bfseries\MakeUppercase{Введение}%
+    \end{center}%
+    \par%
+}
+
+% Команда для оформления заключения
+\newcommand{\conclusion}{%
+    \clearpage%
+    \phantomsection%
+    \addcontentsline{toc}{section}{ЗАКЛЮЧЕНИЕ}%
+    \begin{center}%
+    \bfseries\MakeUppercase{Заключение}%
+    \end{center}%
+    \par%
+}
+
+% Команда для оформления контрольных вопросов
+\newcommand{\selfcheckquestions}{%
+    \clearpage%
+    \phantomsection%
+    \addcontentsline{toc}{section}{КОНТРОЛЬНЫЕ ВОПРОСЫ}%
+    \begin{center}%
+    \bfseries\MakeUppercase{Контрольные вопросы}%
+    \end{center}%
+    \par%
+}
+
+% Команда для оформления списка литературы
+\newcommand{\references}{%
+    \clearpage%
+    \phantomsection%
+    \addcontentsline{toc}{section}{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}%
+    \begin{center}%
+    \bfseries\MakeUppercase{Список использованных источников}%
+    \end{center}%
+    \par%
+}
+
+% Команда для оформления приложений
+\newcommand{\appendixheader}{%
+    \clearpage%
+    \phantomsection%
+    \addcontentsline{toc}{section}{ПРИЛОЖЕНИЯ}%
+    \begin{center}%
+    \bfseries\MakeUppercase{Приложения}%
+    \end{center}%
+    \par%
+}
+
+% Дополнительные команды из gost-7-32-headings.sty
+\newcommand{\essay}{%
+    \begin{center}%
+    \bfseries\MakeUppercase{Реферат}%
+    \end{center}%
+}
+
+\newcommand{\definitions}{%
+    \begin{center}%  
+    \bfseries\MakeUppercase{Определения}%
+    \end{center}%
+}
+
+\newcommand{\abbreviations}{%
+    \begin{center}%
+    \bfseries\MakeUppercase{Обозначения и сокращения}%
+    \end{center}%
+}
+
+\newcommand{\defsabbrs}{%
+    \begin{center}%
+    \bfseries\MakeUppercase{Определения, обозначения и сокращения}%
+    \end{center}%
+}
+
+\endinput 

@@ -1,0 +1,26 @@
+\ProvidesPackage{gost-7-32-captions}[2022/01/28 GOST 7.32-2017]
+
+\RequirePackage{caption}
+
+%
+% https://tex.stackexchange.com/questions/625344/how-can-i-change-the-label-separator-from-endash-to-emdash
+%
+\DeclareCaptionLabelSeparator{emdash}{ \textemdash\ }
+
+%
+% Table caption aligned to the left with dash as a separator
+%
+\captionsetup[table]{
+    labelsep=emdash,
+    skip=0pt,
+    singlelinecheck=off
+}
+
+%
+% Dash as separator in figure caption and centering
+%
+\captionsetup[figure]{
+    name={Рисунок},
+    labelsep=emdash,
+    justification=centering
+}

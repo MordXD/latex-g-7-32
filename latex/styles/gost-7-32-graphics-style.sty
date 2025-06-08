@@ -1,0 +1,136 @@
+% graphics-style.sty - Стилевой файл для оформления графиков и изображений по ГОСТ 7-32-2017
+%
+% Данный стилевой файл содержит настройки для оформления
+% графиков и изображений в соответствии с ГОСТ 7-32-2017.
+%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{gost-7-32-graphics-style}[2024/03/10 v1.0 Graphics style for GOST 7-32-2017]
+
+% Загружаем необходимые пакеты
+\RequirePackage{graphicx}
+\RequirePackage{subcaption}
+\RequirePackage{wrapfig}
+\RequirePackage{float}
+\RequirePackage{caption}
+
+% Настройка стиля подписей к изображениям в соответствии с ГОСТ 7-32-2017
+\captionsetup{
+  format=plain,       % Простой формат (без рамок)
+  labelformat=default, % Стандартное форматирование метки
+  labelsep=endash,    % Разделитель между номером и заголовком - длинное тире
+  justification=centering, % Выравнивание подписи по центру
+  singlelinecheck=true, % Проверять наличие одной строки для центрирования
+  font={normalsize},  % Размер шрифта для подписи
+  labelfont={normalsize}, % Размер шрифта для номера рисунка
+  skip=10pt,          % Расстояние после подписи
+  position=bottom     % Располагать подпись под рисунком
+}
+
+% Настройка для подрисунков
+\captionsetup[subfigure]{
+  format=plain,       % Простой формат
+  labelformat=brace,  % Формат метки с фигурной скобкой
+  labelsep=space,     % Пробел после метки
+  textfont=normalsize, % Обычный размер текста
+  justification=centering, % Выравнивание текста по центру
+  skip=6pt,           % Расстояние после подписи
+  position=bottom     % Позиция подписи внизу
+}
+
+% Настройка плавающих объектов
+\floatplacement{figure}{ht!} % Поместить рисунок здесь (h) или вверху страницы (t)
+
+% Определение команды для единообразной вставки изображений
+\newcommand{\imgfull}[3][]{%
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth,#1]{#2}
+    \caption{#3}
+    \label{fig:#2}
+  \end{figure}
+}
+
+% Команда для вставки изображения с указанной шириной
+\newcommand{\imgwidth}[4][]{%
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=#4\textwidth,#1]{#2}
+    \caption{#3}
+    \label{fig:#2}
+  \end{figure}
+}
+
+% Команда для вставки изображения с указанной высотой
+\newcommand{\imgheight}[4][]{%
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[height=#4\textheight,#1]{#2}
+    \caption{#3}
+    \label{fig:#2}
+  \end{figure}
+}
+
+% Команда для вставки двух изображений рядом
+\newcommand{\imgdouble}[6]{%
+  \begin{figure}[ht]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{#1}
+      \caption{#3}
+      \label{fig:#1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{#2}
+      \caption{#4}
+      \label{fig:#2}
+    \end{minipage}
+    \caption*{#5: #6}
+  \end{figure}
+}
+
+% Команда для вставки подграфиков (2×2)
+\newcommand{\imgquad}[9]{%
+  \begin{figure}[ht!]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{#1}
+      \caption{#5}
+      \label{fig:#1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{#2}
+      \caption{#6}
+      \label{fig:#2}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{#3}
+      \caption{#7}
+      \label{fig:#3}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{#4}
+      \caption{#8}
+      \label{fig:#4}
+    \end{subfigure}
+    \caption{#9}
+    \label{fig:quad}
+  \end{figure}
+}
+
+% Путь к директории с изображениями
+\graphicspath{{images/}}
+
+\endinput

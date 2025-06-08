@@ -1,0 +1,53 @@
+\ProvidesPackage{gost-7-32-headings}[2022/01/28 GOST 7.32-2017]
+
+\RequirePackage{titlesec}
+\RequirePackage{titling}
+\RequirePackage{setspace}
+\RequirePackage{chngcntr}
+
+\RequirePackage{gost-7-32-counters}
+
+%
+% Set custom formatting to well-known LaTeX commands: section, subsection and subsubsection
+% Эти настройки переопределены в gost-7-32-sections.sty
+%
+
+%
+% Make special headings, that have their own formatting rules:
+% - centered
+% - all-caps
+% - bold
+%
+% Only three of them must appear in TOC: introduction, conclusion and references
+%
+% Эти команды были перемещены в gost-7-32-sections.sty
+% Определения удалены, чтобы избежать конфликта команд
+
+%
+% Appendices headings. Appendices have autoincrementing number, 
+% that is represented with russian letter.
+% This heading must appear in TOC
+%
+\newcounter{appendixcnt}
+\renewcommand{\theappendixcnt}{\AlphRus{appendixcnt}}
+\setcounter{appendixcnt}{0}
+
+\renewcommand{\appendix}[1]{
+    % Join tables and figures counters with appendices counter 
+    % strictly before incrementing it
+    % It is necessary to reset these counters after incrementing
+    % appendices counter and prevent numbering shifting
+    \counterwithin{table}{appendixcnt}
+    \counterwithin{figure}{appendixcnt}
+    
+    % Now I can increment appendices counter and use it
+    \stepcounter{appendixcnt}
+    
+    \addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ \theappendixcnt. #1}
+    \begin{center}
+        \bfseries\large
+        Приложение \theappendixcnt
+        
+        #1
+    \end{center}
+}
