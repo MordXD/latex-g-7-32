@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "latex-doc-generator"
+version = "0.1.0"
+description = "ГОСТ 7-32 LaTeX Template and Course Work - FastAPI Backend"
+authors = ["MordXD <kotkinegor78@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [{include = "backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.1"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+watchdog = "^3.0.0"
+python-dotenv = "^1.0.0"
+pydantic = "^2.5.0"
+aiofiles = "^23.2.1"
+websockets = "^12.0"
+python-multipart = "^0.0.6"
+httpx = "^0.28.1"
+pandas = "^2.3.3"
+openpyxl = "^3.1.5"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-asyncio = "^0.21.1"
+black = "^23.11.0"
+isort = "^5.12.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.main.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+line_length = 88

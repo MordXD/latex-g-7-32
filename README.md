@@ -1,121 +1,359 @@
-# ГОСТ 7-32 LaTeX Шаблон и Курсовая работа
+# ГОСТ 7-32 LaTeX Document Generator with FastAPI + OpenWebUI
 
-Этот репозиторий содержит LaTeX шаблон для оформления документов по ГОСТ 7-32 и курсовую работу по теоретическим основам электротехники.
+Modern Docker-based infrastructure for generating PDF documents using LaTeX templates with GOST 7-32 standards. Features FastAPI backend and OpenWebUI frontend for seamless document creation and editing.
 
-## 📁 Структура проекта
+## 🏗️ Architecture
+
+### 🚀 Modern Stack
+- **Backend**: FastAPI with Poetry + Docker
+- **Frontend**: OpenWebUI (Chat-based interface)
+- **Compilation**: pdflatex with full TeX Live
+- **Storage**: Docker volumes for PDFs and logs
+- **Communication**: REST API + WebSocket for real-time updates
+
+### 🐳 Docker Services
+- `backend`: FastAPI service for LaTeX compilation
+- `openwebui`: Web interface for document generation
+- `nginx`: Reverse proxy (production mode)
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Docker & Docker Compose
+- 4GB+ available disk space (for TeX Live)
+
+### 1. Start Services
+```bash
+# Production mode
+docker compose up --build
+
+# Development mode (with live reload)
+docker compose -f docker-compose.dev.yml up --build
+```
+
+### 2. Access Services
+- **OpenWebUI**: http://localhost:3000
+- **FastAPI Backend**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
+
+### 3. Generate Your First Document
+1. Open http://localhost:3000
+2. Use the LaTeX Compiler Tool in the chat interface
+3. Try: **"Show me available LaTeX templates"**
+4. Then: **"Compile the main template"**
+
+## 📁 Project Structure
 
 ```
-├── latex/                      # LaTeX документы
-│   ├── styles/                 # Стили и классы ГОСТ
-│   │   ├── gost-7-32.cls      # Основной класс документа
-│   │   └── gost-7-32-*.sty   # Модули стилей
-│   ├── images/                # Изображения для документов
-│   ├── scripts/               # Python скрипты для генерации графиков
-│   ├── main.tex              # Основной документ курсовой работы
-│   ├── aicalendar.tex        # Дополнительный документ
-│   └── sources.bib           # Библиография
-├── web-app/                   # Веб-приложение для просмотра
-│   ├── app.py                # Flask приложение
-│   ├── requirements.txt      # Python зависимости
-│   ├── static/               # Статические файлы
-│   └── templates/            # HTML шаблоны
-├── docs/                     # Документация проекта
-│   ├── README.md            # Документация веб-приложения
-│   ├── README_WEBUI.md      # Инструкции по веб-интерфейсу
-│   └── DOCS.md              # Подробная документация
-├── .gitignore               # Игнорируемые файлы
-└── README.md                # Этот файл
+├── backend/                   # FastAPI application
+│   └── app/
+│       ├── main.py           # FastAPI app entry point
+│       ├── routers/          # API routes
+│       ├── services/         # Business logic
+│       └── models/           # Pydantic models
+├── latex/                     # LaTeX templates & styles
+│   ├── styles/               # ГОСТ 7-32 styling
+│   ├── images/               # Document images
+│   └── main.tex              # Main template
+├── plugins/                   # OpenWebUI custom tools
+│   └── latex_compiler.py     # LaTeX compilation tool
+├── pdf/                       # Generated PDFs (volume)
+├── logs/                      # Application logs (volume)
+├── docker-compose.yml         # Production Docker setup
+├── docker-compose.dev.yml     # Development setup
+├── Dockerfile                 # Backend container
+├── pyproject.toml            # Poetry configuration
+└── .env                      # Environment variables
 ```
 
-## 🚀 Быстрый старт
+## 🛠️ API Usage
 
-### Компиляция LaTeX документа
+### REST API Endpoints
 
-1. Убедитесь, что у вас установлен LaTeX (рекомендуется TeX Live или MiKTeX)
-2. Перейдите в папку `latex/`
-3. Скомпилируйте основной документ:
-   ```bash
-   cd latex/
-   pdflatex main.tex
-   bibtex main
-   pdflatex main.tex
-   pdflatex main.tex
-   ```
+#### Compile LaTeX Document
+```bash
+curl -X POST "http://localhost:8000/api/compile" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "\\documentclass[14pt]{styles/gost-7-32}\n\\begin{document}\nHello World\n\\end{document}"
+  }'
+```
 
-### Запуск веб-приложения
+#### Get Available Templates
+```bash
+curl "http://localhost:8000/api/templates"
+```
 
-1. Установите Python зависимости:
-   ```bash
-   cd web-app/
-   pip install -r requirements.txt
-   ```
+#### Download Compiled PDF
+```bash
+curl "http://localhost:8000/api/download/{compilation_id}/pdf" \
+  --output document.pdf
+```
 
-2. Запустите приложение:
-   ```bash
-   python app.py
-   ```
+### WebSocket Real-time Compilation
+```javascript
+// Connect to WebSocket for live compilation updates
+const ws = new WebSocket('ws://localhost:8000/ws/compile');
 
-3. Откройте браузер и перейдите по адресу `http://localhost:5000`
+// Send compilation request
+ws.send(JSON.stringify({
+  type: 'compile',
+  content: '\\documentclass[14pt]{styles/gost-7-32}...'
+}));
 
-## 📋 Содержание курсовой работы
+// Receive progress updates
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Compilation progress:', data);
+};
+```
 
-Курсовая работа включает в себя:
+## 🎯 OpenWebUI Integration
 
-### Задача 1: Расчет резистивных цепей постоянного тока
-- Метод уравнений Кирхгофа
-- Метод контурных токов
-- Метод узловых потенциалов
-- Метод двух узлов
-- Метод наложения
-- Метод эквивалентного генератора
-- Расчет баланса мощностей
+### Available Tools in Chat
 
-### Задача 2: Расчет разветвленных цепей синусоидального тока
-- Метод уравнений Кирхгофа для комплексных величин
-- Метод контурных токов
-- Метод узловых потенциалов
-- Метод двух узлов
-- Метод наложения
-- Метод эквивалентного генератора
-- Построение векторных диаграмм
-- АЧХ и ФЧХ анализ
-- Расчет баланса мощностей
+#### 1. Compile LaTeX Content
+```
+User: "Compile this LaTeX document for me:
+\documentclass[14pt]{styles/gost-7-32}
+\begin{document}
+Это тестовый документ ГОСТ 7-32
+\end{document}"
 
-## 🛠 Особенности шаблона ГОСТ 7-32
+Assistant: ✅ Document compiled successfully!
+📥 Download: http://localhost:8000/pdf/xyz123.pdf
+⏱️ Compilation time: 2.1 seconds
+```
 
-- Полное соответствие ГОСТ 7-32-2017
-- Модульная структура стилей
-- Поддержка русского языка
-- Автоматическая нумерация разделов, формул, рисунков
-- Правильное оформление списков литературы
-- Поддержка технических символов и формул
+#### 2. List Templates
+```
+User: "Show me available LaTeX templates"
 
-## 📊 Генерация графиков
+Assistant: 📄 Found 3 LaTeX templates:
+• main (main.tex) - Main coursework template
+• report (report.tex) - Report template
+• thesis (thesis.tex) - Thesis template
+```
 
-В папке `latex/scripts/` находятся Python скрипты для генерации графиков:
-- `generate_graphs.py` - основной скрипт генерации
-- `all_plots.py` - дополнительные графики
-- `phase_plot.py` - фазовые диаграммы
+#### 3. Compile with Customizations
+```
+User: "Compile the main template, replace 'Студент' with 'Иванов Иван'"
 
-## 🔧 Требования
+Assistant: ✅ Template compiled with customizations!
+📥 Download: http://localhost:8000/pdf/abc456.pdf
+```
 
-### Для LaTeX:
-- TeX Live 2020+ или MiKTeX
-- Пакеты: babel, fontenc, inputenc, graphicx, amsmath, siunitx, circuitikz
+## 🔧 Configuration
 
-### Для веб-приложения:
-- Python 3.7+
-- Flask
-- Другие зависимости указаны в `web-app/requirements.txt`
+### Environment Variables (.env)
+```bash
+# FastAPI Settings
+HOST=0.0.0.0
+PORT=8000
+DEBUG=true
 
-## 📝 Лицензия
+# LaTeX Settings
+LATEX_TIMEOUT=60
+LATEX_OUTPUT_DIR=pdf
+LATEX_WORK_DIR=latex
 
-Этот проект распространяется под лицензией MIT. См. файл LICENSE для подробностей.
+# CORS Settings
+CORS_ORIGINS=["http://localhost:3000", "http://openwebui:3000"]
 
-## 🤝 Вклад в проект
+# Logging
+LOG_LEVEL=INFO
+```
 
-Приветствуются любые улучшения и исправления! Пожалуйста, создавайте Pull Request или Issues.
+### Custom LaTeX Templates
+Add new templates to `latex/` directory:
+```bash
+# Add new template
+cp latex/main.tex latex/my_template.tex
+# Edit template content
+# Template automatically available via API
+```
 
-## 📞 Контакты
+## 📋 GOST 7-32 LaTeX Templates
 
-Если у вас есть вопросы по использованию шаблона или курсовой работы, создайте Issue в этом репозитории. 
+The project includes comprehensive templates for academic and technical documents:
+
+### Included Templates
+- **main.tex** - Electrical engineering coursework with calculations
+- **Report templates** - Academic reports following GOST standards
+- **Thesis templates** - Diploma and thesis documents
+
+### Electric Engineering Coursework Content
+The included coursework covers:
+
+#### Task 1: DC Circuit Analysis
+- Kirchhoff's laws method
+- Mesh current analysis
+- Nodal analysis
+- Two-node method
+- Superposition principle
+- Thevenin/Norton equivalent
+- Power balance calculations
+
+#### Task 2: AC Circuit Analysis
+- Complex Kirchhoff's laws
+- AC mesh analysis
+- AC nodal analysis
+- Complex superposition
+- Frequency response analysis
+- Vector diagrams
+- Power calculations
+
+### 🛠 GOST 7-32 Features
+- Full compliance with ГОСТ 7-32-2017 standards
+- Modular styling system
+- Cyrillic text support
+- Automatic numbering for sections, formulas, figures
+- Proper bibliography formatting
+- Technical symbol and formula support
+
+## 📊 Graph Generation
+
+Python scripts in `latex/scripts/` for technical diagrams:
+- `generate_graphs.py` - Primary graph generation
+- `all_plots.py` - Additional plots
+- `phase_plot.py` - Phase diagrams
+
+## 🐳 Advanced Docker Operations
+
+### Production Deployment
+```bash
+# Minimize image size using multi-stage builds
+docker compose -f docker-compose.yml --profile production up --build
+
+# Scale services
+docker compose up --scale backend=3 --scale openwebui=2
+
+# healthcheck status
+docker compose ps
+```
+
+### Debugging
+```bash
+# View backend logs
+docker compose logs -f backend
+
+# Access container shell
+docker compose exec backend bash
+
+# Test LaTeX compilation
+docker compose exec backend pdflatex --version
+```
+
+### Environment Customization
+```bash
+# Custom ports
+PORT=8080 docker compose up
+
+# Custom LaTeX packages
+LATEX_PACKAGES="tikz,pgfplots" docker compose up
+```
+
+## 🔧 Development Workflow
+
+### Local Development Setup
+```bash
+# Install dependencies locally
+pip install poetry
+poetry install
+
+# Run with hot reload
+poetry run uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Run tests
+poetry run pytest
+```
+
+### Code Quality
+```bash
+# Format code
+poetry run black backend/
+poetry run isort backend/
+
+# Type checking
+poetry run mypy backend/
+```
+
+## 🧪 Testing
+
+### API Testing
+```bash
+# Test compilation endpoint
+curl -X POST "http://localhost:8000/api/compile" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "\\documentclass[14pt]{styles/gost-7-32}\\begin{document}Test\\end{document}"}'
+
+# Test WebSocket compilation
+wscat -c ws://localhost:8000/ws/compile
+```
+
+### Integration Tests
+```bash
+# Run full integration test
+docker compose -f docker-compose.test.yml up --abort-on-container-exit
+```
+
+## 📊 Monitoring & Logging
+
+### View Logs
+```bash
+# All services
+docker compose logs -f
+
+# Specific service
+docker compose logs -f backend
+
+# Application logs
+tail -f logs/app.log
+```
+
+### Health Checks
+- Backend: http://localhost:8000/health
+- OpenWebUI: http://localhost:3000
+- API Docs: http://localhost:8000/docs
+
+## 🔐 Security Considerations
+
+- LaTeX compilation runs in isolated containers
+- File uploads validated and sanitized
+- Compilation timeouts prevent resource exhaustion
+- CORS configured for production domains
+- Volume permissions restricted
+
+## 📝 License
+
+This project is licensed under the MIT License. See LICENSE file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a Pull Request
+
+### Contribution Areas
+- LaTeX template improvements
+- Additional OpenWebUI tools
+- Docker optimizations
+- Documentation enhancements
+- New compilation features
+
+## 📞 Support
+
+For questions or issues:
+
+- **Documentation**: Check `/docs` directory
+- **Issues**: Create GitHub Issue
+- **Chat**: Join our Discord community
+- **Support**: `support@project.com`
+
+---
+
+**Built with ❤️ for the Russian academic community** 

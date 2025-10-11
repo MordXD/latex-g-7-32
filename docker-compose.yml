@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: latex-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount latex directory for templates and styles
+      - ./latex:/app/latex:ro
+      # Mount pdf directory for compiled documents
+      - ./pdf:/app/pdf
+      # Mount logs directory
+      - ./logs:/app/logs
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=true
+      - LATEX_TIMEOUT=60
+      - LATEX_OUTPUT_DIR=pdf
+      - LATEX_WORK_DIR=latex
+      - CORS_ORIGINS=["http://localhost:3000", "http://openwebui:3000"]
+      - LOG_LEVEL=INFO
+    networks:
+      - latex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # OpenWebUI Frontend Service
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: latex-openwebui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://localhost:11434
+      - WEBUI_NAME="LaTeX Document Generator"
+      - DEFAULT_MODELS=claude-3,claude-3-haiku,claude-3-opus
+      - DEFAULT_USER_ROLE=user
+      - ENABLE_SIGNUP=false
+      - ENABLE_USER_MANAGEMENT=true
+    volumes:
+      # OpenWebUI data volume
+      - openwebui-data:/app/backend/data
+      # Custom tools and plugins volume
+      - ./plugins:/app/tools/custom:ro
+    networks:
+      - latex-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+    command: ["--", "--api-base-url", "http://backend:8000"]
+
+  # Optional: Nginx reverse proxy for production
+  nginx:
+    image: nginx:alpine
+    container_name: latex-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./pdf:/var/www/pdf:ro
+    networks:
+      - latex-network
+    depends_on:
+      - backend
+      - openwebui
+    restart: unless-stopped
+    profiles:
+      - production
+
+volumes:
+  openwebui-data:
+    driver: local
+
+networks:
+  latex-network:
+    driver: bridge

@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend Service (Development)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: latex-backend-dev
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount latex directory for live editing
+      - ./latex:/app/latex
+      # Mount pdf directory for compiled documents
+      - ./pdf:/app/pdf
+      # Mount logs directory
+      - ./logs:/app/logs
+      # Mount backend code for live reloading
+      - ./backend:/app/backend
+      # Mount pyproject.toml for dependency changes
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./poetry.lock:/app/poetry.lock
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=true
+      - LATEX_TIMEOUT=120
+      - LATEX_OUTPUT_DIR=pdf
+      - LATEX_WORK_DIR=latex
+      - CORS_ORIGINS=["http://localhost:3000", "http://openwebui:3000", "http://localhost:5173"]
+      - LOG_LEVEL=DEBUG
+    networks:
+      - latex-network-dev
+    restart: unless-stopped
+    command: ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # OpenWebUI Frontend Service (Development)
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: latex-openwebui-dev
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://localhost:11434
+      - WEBUI_NAME="LaTeX Document Generator (Dev)"
+      - DEFAULT_MODELS=claude-3,claude-3-haiku,claude-3-opus
+      - DEFAULT_USER_ROLE=user
+      - ENABLE_SIGNUP=true
+      - ENABLE_USER_MANAGEMENT=true
+      - WEBUI_DEBUG=true
+    volumes:
+      - openwebui-dev-data:/app/backend/data
+      - ./plugins:/app/tools/custom:ro
+    networks:
+      - latex-network-dev
+    depends_on:
+      - backend
+    restart: unless-stopped
+    command: ["--", "--api-base-url", "http://backend:8000"]
+
+volumes:
+  openwebui-dev-data:
+    driver: local
+
+networks:
+  latex-network-dev:
+    driver: bridge
