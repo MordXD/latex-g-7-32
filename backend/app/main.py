@@ -12,6 +12,9 @@ from app.models.compilation import CompilationStatus
 
 load_dotenv()
 
+# Ensure directories required before configuring logging
+os.makedirs("logs", exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=getattr(logging, os.getenv("LOG_LEVEL", "INFO")),
