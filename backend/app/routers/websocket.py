@@ -74,7 +74,8 @@ async def run_compilation_with_progress(
     content: str,
     connection_id: str,
     compilation_id: str,
-    compiler_options: dict = None
+    compiler_options: dict = None,
+    file_path: str = None
 ):
     """
     Run LaTeX compilation with real-time progress updates
@@ -119,6 +120,7 @@ async def run_compilation_with_progress(
         # Run actual compilation
         result = latex_service.compile_latex_document(
             content=content,
+            file_path=file_path,
             compiler_options=compiler_options
         )
 
@@ -207,10 +209,11 @@ async def websocket_compile_endpoint(websocket: WebSocket):
                 # Start new compilation task
                 compilation_task = asyncio.create_task(
                     run_compilation_with_progress(
-                        content=content if content else "",
+                        content=content,
                         connection_id=connection_id,
                         compilation_id=compilation_id,
-                        compiler_options=compiler_options
+                        compiler_options=compiler_options,
+                        file_path=file_path
                     )
                 )
                 manager.compilation_tasks[connection_id] = compilation_task
