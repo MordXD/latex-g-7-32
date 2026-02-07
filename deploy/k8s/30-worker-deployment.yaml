@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latex-worker
+  namespace: latex-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: latex-worker
+  template:
+    metadata:
+      labels:
+        app: latex-worker
+    spec:
+      containers:
+      - name: worker
+        image: your-registry/latex-backend:latest
+        imagePullPolicy: IfNotPresent
+        command: ["python", "backend/worker.py"]
+        envFrom:
+        - configMapRef:
+            name: latex-config
+        - secretRef:
+            name: latex-secrets
+        resources:
+          requests:
+            memory: "512Mi" # LaTeX нужно больше памяти
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"

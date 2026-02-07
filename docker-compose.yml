@@ -23,8 +23,16 @@ services:
       - LATEX_TIMEOUT=60
       - LATEX_OUTPUT_DIR=pdf
       - LATEX_WORK_DIR=latex
-      - CORS_ORIGINS=["http://localhost:3000", "http://openwebui:3000"]
       - LOG_LEVEL=INFO
+      - REDIS_URL=redis://redis:6379/0
+      - S3_ENDPOINT_URL=http://minio:9000
+      - S3_ACCESS_KEY=minioadmin
+      - S3_SECRET_KEY=minioadmin
+      - S3_BUCKET_NAME=latex-pdfs
+    depends_on:
+      - rabbitmq
+      - redis
+      - minio
     networks:
       - latex-network
     restart: unless-stopped
@@ -34,31 +42,39 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-
-  # OpenWebUI Frontend Service
-  openwebui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: latex-openwebui
+  rabbitmq:
+    image: rabbitmq:3-management
     ports:
-      - "3000:8080"
-    environment:
-      - OLLAMA_BASE_URL=http://localhost:11434
-      - WEBUI_NAME="LaTeX Document Generator"
-      - DEFAULT_MODELS=claude-3,claude-3-haiku,claude-3-opus
-      - DEFAULT_USER_ROLE=user
-      - ENABLE_SIGNUP=false
-      - ENABLE_USER_MANAGEMENT=true
+      - "5672:5672"
+      - "15672:15672"
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
     volumes:
-      # OpenWebUI data volume
-      - openwebui-data:/app/backend/data
-      # Custom tools and plugins volume
-      - ./plugins:/app/tools/custom:ro
-    networks:
-      - latex-network
+      - redis_data:/data
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+  createbuckets:
+    image: minio/mc
     depends_on:
-      - backend
-    restart: unless-stopped
-    command: ["--", "--api-base-url", "http://backend:8000"]
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/latex-pdfs;
+      /usr/bin/mc policy set download myminio/latex-pdfs;
+      exit 0;
+      "
 
   # Optional: Nginx reverse proxy for production
   nginx:
@@ -79,11 +95,9 @@ services:
     restart: unless-stopped
     profiles:
       - production
-
 volumes:
-  openwebui-data:
-    driver: local
-
+  redis_data:
+  minio_data:
 networks:
   latex-network:
     driver: bridge

@@ -1,1 +1,36 @@
-["str] = os.getenv(\"REDIS_PASSWORD\")\n    REDIS_TASK_TTL: int = int(os.getenv(\"REDIS_TASK_TTL", "86400\"))  # 24 hours\n    REDIS_TASK_PREFIX: str = os.getenv(\"REDIS_TASK_PREFIX", "latex_task:\")\n    REDIS_LOCK_PREFIX: str = os.getenv(\"REDIS_LOCK_PREFIX", "latex_lock:", "S3 / MinIO (File Storage) ======\n    S3_ENDPOINT_URL: Optional[str] = os.getenv(\"S3_ENDPOINT_URL\")  # For MinIO\n    S3_ACCESS_KEY_ID: str = os.getenv(\"S3_ACCESS_KEY_ID", "minioadmin\")\n    S3_SECRET_ACCESS_KEY: str = os.getenv(\"S3_SECRET_ACCESS_KEY", "minioadmin\")\n    S3_BUCKET_NAME: str = os.getenv(\"S3_BUCKET_NAME", "latex-pdfs\")\n    S3_REGION: str = os.getenv(\"S3_REGION", "us-east-1\")\n    S3_PRESIGNED_URL_EXPIRES: int = int(os.getenv(\"S3_PRESIGNED_URL_EXPIRES", "3600\"))  # 1 hour\n    S3_USE_SSL: bool = os.getenv(\"S3_USE_SSL", "true\").lower() == \"true\"\n    S3_VERIFY_SSL: bool = os.getenv(\"S3_VERIFY_SSL", "true\").lower() == \"true\"\n\n    # Path prefixes in S3\n    S3_PDF_PREFIX: str = os.getenv(\"S3_PDF_PREFIX", "pdfs/\")\n    S3_LOG_PREFIX: str = os.getenv(\"S3_LOG_PREFIX", "logs/\")\n\n    # ====== RabbitMQ (Message Queue) ======\n    RABBITMQ_URL: str = os.getenv(\n        \"RABBITMQ_URL", "amqp://guest:guest@localhost:5672/\"\n    )\n    RABBITMQ_VHOST: str = os.getenv(\"RABBITMQ_VHOST", "/\")\n    RABBITMQ_TASKS_QUEUE: str = os.getenv(\"LATEX_TASKS_QUEUE", "latex_tasks\")\n    RABBITMQ_RESULTS_QUEUE: str = os.getenv(\"LATEX_RESULTS_QUEUE", "latex_results\")\n\n    # ====== LaTeX Compiler ======\n    LATEX_TIMEOUT: int = int(os.getenv(\"LATEX_TIMEOUT", "60\"))  # seconds\n    LATEX_OUTPUT_DIR: str = os.getenv(\"LATEX_OUTPUT_DIR", "/tmp/latex_output\")\n    LATEX_WORK_DIR: str = os.getenv(\"LATEX_WORK_DIR", "/tmp/latex_work\")\n    LATEX_MAX_RETRIES: int = int(os.getenv(\"LATEX_MAX_RETRIES", "2\"))\n\n    # ====== API ======\n    API_HOST: str = os.getenv(\"API_HOST", "0.0.0.0\")\n    API_PORT: int = int(os.getenv(\"API_PORT", "8000\"))\n    API_WORKERS: int = int(os.getenv(\"API_WORKERS", "4\"))\n\n    # ====== Worker ======\n    WORKER_CONCURRENCY: int = int(os.getenv(\"WORKER_CONCURRENCY", "4\"))\n    WORKER_PREFETCH_COUNT: int = int(os.getenv(\"WORKER_PREFETCH_COUNT", "10\"))\n\n    # ====== Health Checks ======\n    HEALTH_CHECK_ENABLED: bool = os.getenv(\"HEALTH_CHECK_ENABLED", "true\").lower() == \"true\"\n    HEALTH_CHECK_REDIS: bool = os.getenv(\"HEALTH_CHECK_REDIS", "true\").lower() == \"true\"\n    HEALTH_CHECK_S3: bool = os.getenv(\"HEALTH_CHECK_S3", "true\").lower() == \"true\"\n    HEALTH_CHECK_RABBITMQ: bool = os.getenv(\"HEALTH_CHECK_RABBITMQ", "true\").lower() == \"true\"\n\n    # ====== Observability ======\n    ENABLE_METRICS: bool = os.getenv(\"ENABLE_METRICS", "true\").lower() == \"true\"\n    ENABLE_TRACING: bool = os.getenv(\"ENABLE_TRACING", "false\").lower() == \"true\"\n\n    @property\n    def is_production(self) -> bool:\n        return self.ENVIRONMENT == \"production\"\n\n    @property\n    def is_development(self) -> bool:\n        return self.ENVIRONMENT == \"development\"\n\n    @property\n    def is_minio(self) -> bool:\n        return self.S3_ENDPOINT_URL is not None and \"minio\" in self.S3_ENDPOINT_URL.lower()\n\n\n@lru_cache\ndef get_settings() -> Settings:\n    \"", "Get cached settings instance\"", "\n    return Settings()\n\n\nsettings = get_settings()"]
+import os
+from functools import lru_cache
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    # App
+    LOG_LEVEL: str = "INFO"
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+
+    # RabbitMQ
+    RABBITMQ_URL: str = os.getenv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
+    LATEX_TASKS_QUEUE: str = "latex_tasks"
+
+    # Redis (State & Pub/Sub)
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    REDIS_TASK_TTL: int = 86400  # 24 часа
+
+    # S3 / MinIO (Storage)
+    S3_ENDPOINT_URL: str = os.getenv("S3_ENDPOINT_URL", "http://localhost:9000")
+    S3_ACCESS_KEY: str = os.getenv("S3_ACCESS_KEY", "minioadmin")
+    S3_SECRET_KEY: str = os.getenv("S3_SECRET_KEY", "minioadmin")
+    S3_BUCKET_NAME: str = "latex-artifacts"
+    S3_REGION: str = "us-east-1"
+    PRESIGNED_URL_EXPIRATION: int = 3600  # 1 час
+
+    # LaTeX
+    LATEX_TIMEOUT: int = 120
+
+    class Config:
+        env_file = ".env"
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+settings = get_settings()

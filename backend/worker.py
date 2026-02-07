@@ -1,197 +1,97 @@
-"""
-LaTeX Compilation Worker
-
-This worker listens to RabbitMQ for compilation tasks and executes pdflatex.
-"""
-import os
-import logging
-import time
 import asyncio
-from typing import Optional
-from pathlib import Path
-
-from dotenv import load_dotenv
-from faststream.rabbit import RabbitBroker, RabbitQueue
-from faststream.rabbit.types import AioPikaSendableMessage
-
-from app.services.latex_service import LaTeXCompiler
+import logging
+import os
+from faststream.rabbit import RabbitBroker
+from app.services.latex_service import latex_service
+from app.services.storage_service import storage_service
+from app.services.state_service import state_service
 from app.models.compilation import CompilationStatus
+from app.config import settings
 
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    level=getattr(logging, os.getenv("LOG_LEVEL", "INFO")),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('logs/worker.log'),
-        logging.StreamHandler()
-    ]
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# RabbitMQ settings
-RABBITMQ_URL = os.getenv(
-    "RABBITMQ_URL",
-    "amqp://guest:guest@rabbitmq:5672/"
-)
+broker = RabbitBroker(url=settings.RABBITMQ_URL)
 
-LATEX_TASKS_QUEUE = os.getenv("LATEX_TASKS_QUEUE", "latex_tasks")
-
-# Compiler settings
-LATEX_TIMEOUT = int(os.getenv("LATEX_TIMEOUT", "60"))
-LATEX_OUTPUT_DIR = os.getenv("LATEX_OUTPUT_DIR", "pdf")
-LATEX_WORK_DIR = os.getenv("LATEX_WORK_DIR", "latex")
-
-# Task results storage URL (for updating task status)
-# In a real distributed system, use Redis or database
-TASK_STATUS_API_URL = os.getenv(
-    "TASK_STATUS_API_URL",
-    "http://backend:8000"
-)
-
-# Create RabbitMQ broker
-broker = RabbitBroker(url=RABBITMQ_URL)
-
-# Create compiler
-compiler = LaTeXCompiler()
-
-
-async def update_task_status_via_http(task_id: str, result: dict):
-    """
-    Update task status via HTTP API
-    (In production, use Redis or database directly)
-    """
-    import httpx
-
-    try:
-        # Note: This is a simplified approach. In production,
-        # the worker should write directly to a shared store (Redis/DB)
-        # and the API should read from that store.
-
-        # For now, we'll publish to a results queue that the API listens to
-        await broker.publish(
-            message={
-                "task_id": task_id,
-                **result
-            },
-            queue="latex_results"
-        )
-
-        logger.info(f"Published result for task {task_id} to results queue")
-
-    except Exception as e:
-        logger.error(f"Failed to update task status for {task_id}: {e}")
-
-
-@broker.subscriber(queue=LATEX_TASKS_QUEUE)
-async def process_compilation_task(message: dict) -> str:
-    """
-    Process a LaTeX compilation task from RabbitMQ
-
-    Args:
-        message: Task message with task_id, content, file_path, compiler_options
-
-    Returns:
-        Task ID
-    """
+@broker.subscriber(queue=settings.LATEX_TASKS_QUEUE)
+async def process_compilation_task(message: dict):
     task_id = message.get("task_id")
     content = message.get("content")
-    file_path = message.get("file_path")
-    compiler_options = message.get("compiler_options", {})
+    options = message.get("compiler_options", {})
 
-    logger.info(f"Processing task {task_id}...")
+    logger.info(f"🚀 Processing task {task_id}")
 
-    # Update status to compiling
-    await update_task_status_via_http(
-        task_id,
-        {
-            "status": CompilationStatus.COMPILING,
-            "message": "Compilation in progress",
-            "progress": 0.1
-        }
+    # 1. Статус -> PROCESSING
+    await state_service.set_task_status(
+        task_id, 
+        CompilationStatus.COMPILING,
+        message="Compilation started"
     )
 
-    try:
-        # Run compilation
-        result = compiler.compile_latex_document(
+    # Callback для отправки логов в Redis Pub/Sub
+    async def progress_reporter(msg: str):
+        await state_service.publish_progress(task_id, {
+            "status": "compiling",
+            "message": msg,
+            "progress": None
+        })
+
+    # 2. Изолированная компиляция во временной папке
+    with latex_service.temporary_work_dir() as work_dir:
+        result = await latex_service.compile_latex_stream(
             content=content,
-            file_path=file_path,
-            compiler_options=compiler_options
+            work_dir=work_dir,
+            compiler_options=options,
+            progress_callback=progress_reporter
         )
 
-        # Prepare result data
-        result_data = {
-            "status": result.status,
-            "message": result.message,
-            "compilation_time": result.compilation_time,
-            "progress": 1.0
-        }
+        if result["success"]:
+            # 3. Загрузка артефактов в S3
+            pdf_key = f"pdfs/{task_id}.pdf"
+            log_key = f"logs/{task_id}.log"
+            
+            s3_pdf = storage_service.upload_file(result["pdf_path"], pdf_key, "application/pdf")
+            s3_log = storage_service.upload_file(result["log_path"], log_key, "text/plain")
 
-        if result.success:
-            result_data.update({
-                "pdf_url": result.pdf_url,
-                "warnings": result.warnings,
-                "log_file": result.log_file
-            })
-            logger.info(f"Task {task_id} completed successfully")
+            if s3_pdf:
+                # 4. Успех
+                await state_service.set_task_status(
+                    task_id,
+                    CompilationStatus.SUCCESS,
+                    message="Compilation completed successfully",
+                    s3_pdf_key=pdf_key,
+                    s3_log_key=log_key
+                )
+                
+                # Финальное сообщение в сокет
+                await state_service.publish_progress(task_id, {
+                    "status": "success",
+                    "message": "Done"
+                })
+                logger.info(f"✅ Task {task_id} completed")
+            else:
+                await _handle_error(task_id, "Failed to upload artifacts to S3")
         else:
-            result_data.update({
-                "error": result.error,
-                "output": result.output,
-                "log_file": result.log_file
-            })
-            logger.error(f"Task {task_id} failed: {result.error}")
+            # Ошибка компиляции
+            error_log_key = f"logs/{task_id}_error.log"
+            # Пробуем сохранить лог ошибок
+            if result["log_path"]:
+                storage_service.upload_file(result["log_path"], error_log_key, "text/plain")
+            
+            await _handle_error(task_id, "LaTeX compilation failed", result["full_log"])
 
-        # Update task status with result
-        await update_task_status_via_http(task_id, result_data)
-
-    except Exception as e:
-        logger.error(f"Unexpected error processing task {task_id}: {e}")
-
-        # Update task status with error
-        await update_task_status_via_http(
-            task_id,
-            {
-                "status": CompilationStatus.ERROR,
-                "message": f"Compilation failed: {str(e)}",
-                "error": str(e),
-                "progress": None
-            }
-        )
-
-    return task_id
-
-
-async def listen_to_results_queue():
-    """
-    Listen to results queue and update API's task status store
-    (This is for when API and worker run in the same process/container)
-    """
-    # This is optional - in distributed setup, API would listen to results queue
-    # Here we just log results for debugging
-    pass
-
-
-async def main():
-    """Main worker entry point"""
-    logger.info("Starting LaTeX Compilation Worker...")
-
-    # Ensure directories exist
-    os.makedirs(LATEX_OUTPUT_DIR, exist_ok=True)
-    os.makedirs(LATEX_WORK_DIR, exist_ok=True)
-    os.makedirs("logs", exist_ok=True)
-
-    # Check pdflatex availability
-    if not compiler.check_pdflatex_available():
-        logger.warning("pdflatex is not available! Compilation will fail.")
-    else:
-        logger.info("pdflatex is available.")
-
-    # Start consuming messages
-    logger.info(f"Listening to queue: {LATEX_TASKS_QUEUE}")
-    await broker.start()
-
+async def _handle_error(task_id: str, message: str, full_log: str = None):
+    await state_service.set_task_status(
+        task_id,
+        CompilationStatus.ERROR,
+        message=message,
+        error=full_log
+    )
+    await state_service.publish_progress(task_id, {
+        "status": "error",
+        "message": message
+    })
+    logger.error(f"❌ Task {task_id} failed: {message}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(broker.start())

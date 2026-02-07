@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: latex-config
+  namespace: latex-app
+data:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  LATEX_TASKS_QUEUE: "latex_tasks"
+  S3_ENDPOINT_URL: "http://minio-service:9000"
+  S3_BUCKET_NAME: "latex-pdfs"
+  S3_REGION: "us-east-1"
+  RABBITMQ_URL: "amqp://guest:guest@rabbitmq-service:5672/"
+  REDIS_URL: "redis://redis-service:6379/0"

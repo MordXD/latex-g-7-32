@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latex-api
+  namespace: latex-app
+spec:
+  replicas: 2  # Демонстрация Stateless
+  selector:
+    matchLabels:
+      app: latex-api
+  template:
+    metadata:
+      labels:
+        app: latex-api
+    spec:
+      containers:
+      - name: api
+        image: your-registry/latex-backend:latest
+        imagePullPolicy: IfNotPresent
+        command: ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: latex-config
+        - secretRef:
+            name: latex-secrets
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
