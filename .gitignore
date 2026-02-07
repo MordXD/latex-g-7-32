@@ -106,7 +106,7 @@ Thumbs.db
 .claude
 # Generated PDFs (uncomment if you don't want to track PDFs)
 # *.pdf
-
+CLAUDE.MD
 # Node modules (if using any JS tools)
 node_modules/
 
