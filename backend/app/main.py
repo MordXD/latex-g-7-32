@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 import os
 import logging
 from dotenv import load_dotenv
-
+from prometheus_fastapi_instrumentator import Instrumentator
 from app.routers import compilation, websocket
 from app.services import latex_service
 from app.models.compilation import CompilationStatus
@@ -40,7 +40,7 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
-
+Instrumentator().instrument(app).expose(app)
 # Configure CORS
 origins = os.getenv("CORS_ORIGINS", '["http://localhost:3000"]').replace(" ", "").split(",")
 app.add_middleware(
