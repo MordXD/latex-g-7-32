@@ -54,3 +54,56 @@ class CompilationHistory(BaseModel):
     compilation_time: float
     success: bool
     error_message: Optional[str] = None
+
+# New models for async task handling
+
+class CompilationTask(BaseModel):
+    """Task message sent to RabbitMQ"""
+    task_id: str
+    content: Optional[str] = None
+    file_path: Optional[str] = None
+    compiler_options: Optional[Dict[str, Any]] = Field(default_factory=dict)
+
+class CompilationTaskSubmission(BaseModel):
+    """Request to submit a compilation task"""
+    content: Optional[str] = None
+    file_path: Optional[str] = None
+    compiler_options: Optional[Dict[str, Any]] = Field(
+        default_factory=lambda: {
+            "interaction": "nonstopmode",
+            "shell_escape": False,
+            "output_directory": "pdf"
+        }
+    )
+
+class CompilationTaskSubmitted(BaseModel):
+    """Response when task is submitted"""
+    task_id: str
+    status: CompilationStatus = CompilationStatus.PENDING
+    message: str = "Task submitted for compilation"
+    status_url: str  # URL to check task status
+
+class TaskStatusResponse(BaseModel):
+    """Response for task status check"""
+    task_id: str
+    status: CompilationStatus
+    message: str
+    progress: Optional[float] = None
+    compilation_time: Optional[float] = None
+    pdf_url: Optional[str] = None
+    error: Optional[str] = None
+    warnings: Optional[str] = None
+    log_file: Optional[str] = None
+    created_at: Optional[float] = None
+    completed_at: Optional[float] = None
+
+class CompilationResult(BaseModel):
+    """Result message sent to results queue"""
+    task_id: str
+    status: CompilationStatus
+    message: str
+    pdf_url: Optional[str] = None
+    compilation_time: Optional[float] = None
+    error: Optional[str] = None
+    warnings: Optional[str] = None
+    log_file: Optional[str] = None

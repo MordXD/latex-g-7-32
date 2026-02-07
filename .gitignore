@@ -103,7 +103,7 @@ Thumbs.db
 *.temp
 *.bak
 *.backup
-
+.claude
 # Generated PDFs (uncomment if you don't want to track PDFs)
 # *.pdf
 

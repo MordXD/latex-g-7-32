@@ -20,6 +20,8 @@ python-multipart = "^0.0.6"
 httpx = "^0.28.1"
 pandas = "^2.3.3"
 openpyxl = "^3.1.5"
+faststream = {extras = ["rabbit"], version = "^0.5.15"}
+aio-pika = "^9.4.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
